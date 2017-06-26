@@ -117,6 +117,8 @@ public class Matrix4i {
 		m43 = tmp;
 	}
 
+
+
 	/**
 	 * Like transform, but creating a new tuple without changing the old one.
 	 * 

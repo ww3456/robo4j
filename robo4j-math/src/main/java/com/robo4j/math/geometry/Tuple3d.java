@@ -23,6 +23,7 @@ package com.robo4j.math.geometry;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class Tuple3d {
+	public static final int DIMENSTION = 3;
 	public double x;
 	public double y;
 	public double z;
@@ -38,6 +39,17 @@ public class Tuple3d {
 		set(val);
 	}
 
+	public Tuple3d(double[] data){
+		x = data[0];
+		y = data[1];
+		z = data[2];
+	}
+
+	public double[] getData(){
+		double[] result = {x, y, z};
+		return result;
+	}
+
 	public static Tuple3d createIdentity() {
 		return new Tuple3d(1, 1, 1);
 	}
@@ -47,6 +59,7 @@ public class Tuple3d {
 		this.y = y;
 		this.z = z;
 	}
+
 
 	public void set(Tuple3d f) {
 		x = f.x;
@@ -76,6 +89,14 @@ public class Tuple3d {
 		x *= f;
 		y *= f;
 		z *= f;
+	}
+
+	public double[] getRefData(){
+		double[] result = new double[3];
+		result[0]=x;
+		result[1]=y;
+		result[2]=z;
+		return result;
 	}
 
 	public Tuple3d diff(Tuple3d f) {

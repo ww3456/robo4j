@@ -16,13 +16,19 @@
  */
 package com.robo4j.math.geometry;
 
+import com.robo4j.math.RoboOutOfRangeException;
+
 /**
  * A three dimensional matrix.
  * 
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Matrix3d {
+public class Matrix3d implements Matrix {
+
+	public static final int DIMENSION = 3;
+	private double[][] data = new double[DIMENSION][DIMENSION];
+
 	public double m11;
 	public double m12;
 	public double m13;
@@ -33,7 +39,8 @@ public class Matrix3d {
 	public double m32;
 	public double m33;
 
-	public Matrix3d(double m11, double m12, double m13, double m21, double m22, double m23, double m31, double m32, double m33) {
+	public Matrix3d(double m11, double m12, double m13, double m21, double m22, double m23, double m31, double m32,
+			double m33) {
 		this.m11 = m11;
 		this.m12 = m12;
 		this.m13 = m13;
@@ -58,6 +65,60 @@ public class Matrix3d {
 		m31 = matrix[6];
 		m32 = matrix[7];
 		m33 = matrix[8];
+	}
+
+	@Override
+	public double[][] getData() {
+		data[0][0] = m11;
+		data[0][1] = m12;
+		data[0][2] = m13;
+		data[1][0] = m21;
+		data[1][1] = m22;
+		data[1][2] = m23;
+		data[2][0] = m31;
+		data[2][1] = m32;
+		data[2][2] = m33;
+
+		return data;
+	}
+
+	@Override
+	public int getDimension() {
+		return DIMENSION;
+	}
+
+	public void fitData(){
+		data[0][0] = m11;
+		data[0][1] = m12;
+		data[0][2] = m13;
+
+		data[1][0] = m21;
+		data[1][1] = m22;
+		data[1][2] = m23;
+
+		data[2][0] = m31;
+		data[2][1] = m32;
+		data[2][2] = m33;
+
+	}
+
+	public void adjustValues(){
+		m11 = data[0][0];
+		m12 = data[0][1];
+		m13 = data[0][2];
+
+		m21 = data[1][0];
+		m22 = data[1][1];
+		m23 = data[1][2];
+
+		m31 = data[2][0];
+		m32 = data[2][1];
+		m33 = data[2][2];
+
+	}
+
+	public void setElement(int row, int column, double val){
+		data[row][column] = val;
 	}
 
 	/**
@@ -107,9 +168,43 @@ public class Matrix3d {
 		return new Matrix3d(1, 0, 0, 0, 1, 0, 0, 0, 1);
 	}
 
+	public void multiplyByFactor(double factor) {
+		m11 = factor * m11;
+		m12 = factor * m12;
+		m13 = factor * m13;
+		m21 = factor * m21;
+		m22 = factor * m22;
+		m23 = factor * m23;
+		m31 = factor * m31;
+		m32 = factor * m32;
+		m33 = factor * m33;
+	}
+
+	public VectorNd operate(double[] v){
+		double[][] tmpData = getData();
+		if(v.length != DIMENSION) {
+			throw new RoboOutOfRangeException("dimension mismatch");
+		} else {
+			double[] result = new double[DIMENSION];
+
+			for(int row = 0; row < DIMENSION; ++row) {
+				double[] dataRow = tmpData[row];
+				double sum = 0.0D;
+
+				for(int i = 0; i < DIMENSION; ++i) {
+					sum += dataRow[i] * v[i];
+				}
+
+				result[row] = sum;
+			}
+
+			return new VectorNd(result);
+		}
+	}
+
 	@Override
 	public String toString() {
-		return String.format("m11:%f, m12:%f, m13:%f, m21:%f, m22:%f, m23:%f, m31:%f, m32:%f, m33:%f", m11, m12, m13, m21, m22, m23, m31,
-				m32, m33);
+		return String.format("m11:%f, m12:%f, m13:%f, m21:%f, m22:%f, m23:%f, m31:%f, m32:%f, m33:%f", m11, m12, m13,
+				m21, m22, m23, m31, m32, m33);
 	}
 }

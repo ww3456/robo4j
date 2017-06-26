@@ -24,6 +24,8 @@ package com.robo4j.math.geometry;
  * @author Miroslav Wengner (@miragemiko)
  */
 public class Matrix4d {
+	private static final int DIMENSION = 4;
+	private double[][] data = new double[DIMENSION][DIMENSION];
 	public double m11;
 	public double m12;
 	public double m13;
@@ -41,8 +43,11 @@ public class Matrix4d {
 	public double m43;
 	public double m44;
 
+	public Matrix4d() {
+	}
+
 	public Matrix4d(double m11, double m12, double m13, double m14, double m21, double m22, double m23, double m24, double m31, double m32, double m33,
-			double m34, double m41, double m42, double m43, double m44) {
+					double m34, double m41, double m42, double m43, double m44) {
 		this.m11 = m11;
 		this.m12 = m12;
 		this.m13 = m13;
@@ -55,10 +60,10 @@ public class Matrix4d {
 		this.m32 = m32;
 		this.m33 = m33;
 		this.m34 = m34;
-		this.m41 = m31;
-		this.m42 = m32;
-		this.m43 = m33;
-		this.m44 = m34;
+		this.m41 = m41;
+		this.m42 = m42;
+		this.m43 = m43;
+		this.m44 = m44;
 	}
 
 	public Matrix4d(double[] matrix) {
@@ -83,6 +88,58 @@ public class Matrix4d {
 		m44 = matrix[15];
 	}
 
+	public void fitData(){
+		data[0][0] = m11;
+		data[0][1] = m12;
+		data[0][2] = m13;
+		data[0][3] = m14;
+
+		data[1][0] = m21;
+		data[1][1] = m22;
+		data[1][2] = m23;
+		data[1][3] = m24;
+
+		data[2][0] = m31;
+		data[2][1] = m32;
+		data[2][2] = m33;
+		data[2][3] = m34;
+
+		data[3][0] = m41;
+		data[3][1] = m42;
+		data[3][2] = m43;
+		data[3][3] = m44;
+	}
+
+	public double[][] getData(){
+		return data;
+	}
+
+	public void adjustValues(){
+		m11 = data[0][0];
+		m12 = data[0][1];
+		m13 = data[0][2];
+		m14 = data[0][3];
+
+		m21 = data[1][0];
+		m22 = data[1][1];
+		m23 = data[1][2];
+		m24 = data[1][3];
+
+		m31 = data[2][0];
+		m32 = data[2][1];
+		m33 = data[2][2];
+		m34 = data[2][3];
+
+		m41 = data[3][0];
+		m42 = data[3][1];
+		m43 = data[3][2];
+		m44 = data[3][3];
+	}
+
+	public void setElement(int row, int column, double val){
+		data[row][column] = val;
+	}
+
 	/**
 	 * Transforms the tuple by multiplying with this matrix.
 	 * 
@@ -99,7 +156,7 @@ public class Matrix4d {
 	/**
 	 * Transposes the matrix.
 	 */
-	public void transpose() {
+	public Matrix4d transpose() {
 		double tmp = m12;
 		m12 = m21;
 		m21 = tmp;
@@ -115,6 +172,13 @@ public class Matrix4d {
 		tmp = m34;
 		m34 = m43;
 		m43 = tmp;
+		return this;
+	}
+
+	public void setSubmatrixL3F0(Tuple3d tuple3d){
+		m31 = tuple3d.x;
+		m32 = tuple3d.y;
+		m33 = tuple3d.z;
 	}
 
 	/**
@@ -132,11 +196,40 @@ public class Matrix4d {
 		return new Tuple4d(x, y, z, t);
 	}
 
+	public Matrix4d multiply(Matrix4d m){
+
+		Matrix4d out = new Matrix4d();
+		this.fitData();
+		for(int row = 0; row < DIMENSION; ++row) {
+			for(int col = 0; col < DIMENSION; ++col) {
+				double sum = 0.0D;
+
+				for(int i = 0; i < DIMENSION; ++i) {
+					sum += data[row][i] * m.getData()[i][col];
+				}
+
+				out.setElement(row, col, sum);
+			}
+		}
+
+		out.adjustValues();
+		return out;
+	}
+
+	public Tuple3d getRowVector3(){
+		return new Tuple3d(m41, 42, 43);
+	}
+
 	/**
 	 * Creates an identity matrix.
 	 */
 	public static Matrix4d createIdentity() {
 		return new Matrix4d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+	}
+
+	// submatrix starts from 0,0
+	public Matrix3d getSubMatrix3d0() {
+		return new Matrix3d(m11, m12, m13, m21, m22, m23, m31, m32, m33);
 	}
 
 	@Override
