@@ -87,7 +87,7 @@ public class Matrix3d implements Matrix {
 		return DIMENSION;
 	}
 
-	public void fitData(){
+	public void fitData() {
 		data[0][0] = m11;
 		data[0][1] = m12;
 		data[0][2] = m13;
@@ -102,7 +102,7 @@ public class Matrix3d implements Matrix {
 
 	}
 
-	public void adjustValues(){
+	public void adjustValues() {
 		m11 = data[0][0];
 		m12 = data[0][1];
 		m13 = data[0][2];
@@ -117,7 +117,7 @@ public class Matrix3d implements Matrix {
 
 	}
 
-	public void setElement(int row, int column, double val){
+	public void setElement(int row, int column, double val) {
 		data[row][column] = val;
 	}
 
@@ -149,7 +149,7 @@ public class Matrix3d implements Matrix {
 	/**
 	 * Transposes the matrix.
 	 */
-	public void transpose() {
+	public Matrix3d transpose() {
 		double tmp = m12;
 		m12 = m21;
 		m21 = tmp;
@@ -159,6 +159,7 @@ public class Matrix3d implements Matrix {
 		tmp = m23;
 		m23 = m32;
 		m32 = tmp;
+		return new Matrix3d(m11, m12, m13, m21, m22, m23, m31, m32, m33);
 	}
 
 	/**
@@ -180,18 +181,18 @@ public class Matrix3d implements Matrix {
 		m33 = factor * m33;
 	}
 
-	public VectorNd operate(double[] v){
+	public VectorNd operate(double[] v) {
 		double[][] tmpData = getData();
-		if(v.length != DIMENSION) {
+		if (v.length != DIMENSION) {
 			throw new RoboOutOfRangeException("dimension mismatch");
 		} else {
 			double[] result = new double[DIMENSION];
 
-			for(int row = 0; row < DIMENSION; ++row) {
+			for (int row = 0; row < DIMENSION; ++row) {
 				double[] dataRow = tmpData[row];
 				double sum = 0.0D;
 
-				for(int i = 0; i < DIMENSION; ++i) {
+				for (int i = 0; i < DIMENSION; ++i) {
 					sum += dataRow[i] * v[i];
 				}
 

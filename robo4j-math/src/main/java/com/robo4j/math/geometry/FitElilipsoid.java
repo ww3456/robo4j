@@ -34,11 +34,11 @@ import java.util.List;
  */
 public class FitElilipsoid {
 
-	private Tuple3d center;
-	private Tuple3d radii;
-	private Tuple3d evecs0;
-	private Tuple3d evecs1;
-	private Tuple3d evecs2;
+	public Tuple3d center;
+	public Tuple3d radii;
+	public Tuple3d evecs0;
+	public Tuple3d evecs1;
+	public Tuple3d evecs2;
 
 	private double[] evals;
 
@@ -54,48 +54,70 @@ public class FitElilipsoid {
 	 *            input ellipsoid , then fit ellipsoid
 	 */
 	void fitEllipsoid(List<Tuple3d> ellipsoidInput) {
-//
-//		VectorNd v = solveInputs(ellipsoidInput);
-//
-//		// Form the algebraic form of the ellipsoid.
-//		Matrix4d a = formAlgebraicMatrix(v);
-//
-//		// Find the center of the ellipsoid.
-//		center = findCenter(a);
-//
-//		// Translate the algebraic form of the ellipsoid to the center.
-//		Matrix4d r = translateToCenter(center, a);
-//
-//		// Generate a submatrix of r.
-//		Matrix3d subr = r.getSubMatrix3d0();
-//
-//		// subr[i][j] = subr[i][j] / -r[3][3]).
-//		r.fitData(); //set internal data value storage
-//		double divr = -r.getData()[3][3];
-//		for (int i = 0; i < subr.getDimension(); i++)
-//		{
-//			for (int j = 0; j < subr.getDimension(); j++)
-//			{
-//				subr.setElement(i, j, subr.getData()[i][j] / divr);
-//			}
-//		}
-//		//adjust data to m_xy values
-//		subr.adjustValues();
 
+		VectorNd v = solveInputs(ellipsoidInput);
+
+		// Form the algebraic form of the ellipsoid.
+		Matrix4d a = formAlgebraicMatrix(v);
+
+		// Find the center of the ellipsoid.
+		center = findCenter(a);
+
+		// Translate the algebraic form of the ellipsoid to the center.
+		Matrix4d r = translateToCenter(center, a);
+
+		// Generate a submatrix of r.
+		Matrix3d subr = r.getSubMatrix3d0();
+
+		// subr[i][j] = subr[i][j] / -r[3][3]).
+		r.fitData(); // set internal data value storage
+		double divr = -r.getData()[3][3];
+		for (int i = 0; i < subr.getDimension(); i++) {
+			for (int j = 0; j < subr.getDimension(); j++) {
+				subr.setElement(i, j, subr.getData()[i][j] / divr);
+			}
+		}
+		// adjust data to m_xy values
+		subr.adjustValues();
+
+		EigenDecomposition ed = new EigenDecomposition(subr, 0);
+		evals = ed.getRealEigenvalues();
+		evecs0 = ed.getEigenvector(0);
+		evecs1 = ed.getEigenvector(1);
+		evecs2 = ed.getEigenvector(2);
+
+		// Find the radii of the ellipsoid.
+		radii = findRadii(evals);
 	}
 
 	// Private Methods
 
-	private Tuple3d findCenter(Matrix4d a){
-		//submatrix m(3,3)
+	/**
+	 * Find the radii of the ellipsoid in ascending order.
+	 * 
+	 * @param evals
+	 *            the eigenvalues of the ellipsoid.
+	 * @return the radii of the ellipsoid.
+	 */
+	private Tuple3d findRadii(double[] evals) {
+		double[] radii = new double[evals.length];
+
+		// radii[i] = sqrt(1/eval[i]);
+		for (int i = 0; i < evals.length; i++) {
+			radii[i] = Math.sqrt(1 / evals[i]);
+		}
+
+		return new Tuple3d(radii);
+	}
+
+	private Tuple3d findCenter(Matrix4d a) {
+		// submatrix m(3,3)
 		Matrix3d subA = a.getSubMatrix3d0();
 		subA.multiplyByFactor(-1.0);
 
-
 		Tuple3d subV = a.getRowVector3();
 		// inv (dtd)
-		DecompositionSolver solver = new SingularDecompositionSolver(subA)
-				.getSolver();
+		DecompositionSolver solver = new SingularDecompositionSolver(subA).getSolver();
 
 		Matrix3d subAi = (Matrix3d) solver.getInverse();
 
@@ -103,14 +125,13 @@ public class FitElilipsoid {
 		return new Tuple3d(resultVector.gedDataRef());
 	}
 
-
-	private Matrix4d translateToCenter(Tuple3d center, Matrix4d a){
+	private Matrix4d translateToCenter(Tuple3d center, Matrix4d a) {
 		// Form the corresponding translation matrix.
 		Matrix4d t = Matrix4d.createIdentity();
 
 		Tuple3d centerMatrix = new Tuple3d();
 
-		//centerMatrix.setRowVector(0, center);
+		// centerMatrix.setRowVector(0, center);
 		centerMatrix.set(center);
 
 		t.setSubmatrixL3F0(centerMatrix);
@@ -164,17 +185,17 @@ public class FitElilipsoid {
 		Matrix9d dtd = d.transpose().multiply(d);
 		VectorNd ones = new VectorNd(pointNumbers);
 
-        // Multiply: d' * ones.mapAddToSelf(1)
-        VectorNd dtOnes = d.transpose().operate(ones.gedDataRef());
+		// Multiply: d' * ones.mapAddToSelf(1)
+		Matrix9d transposeMatrix9d = d.transpose();
+		VectorNd dtOnes = transposeMatrix9d.operate(ones.gedDataRef());
 
-        // Find ( d' * d )^-1
+		// Find ( d' * d )^-1
 		DecompositionSolver solver = new SingularDecompositionSolver(dtd).getSolver();
 
-//		Matrix9d dtdi = solver.getInverse();
+		 Matrix9d dtdi = (Matrix9d) solver.getInverse();
 
 		// v = (( d' * d )^-1) * ( d' * ones.mapAddToSelf(1));
-//        return  dtdi.operate(dtOnes.gedDataRef());
-		return null;
+		 return dtdi.operate(dtOnes.gedDataRef());
 	}
 
 	/**
@@ -185,8 +206,7 @@ public class FitElilipsoid {
 	 *            the vector polynomial.
 	 * @return the matrix of the algebraic form of the polynomial.
 	 */
-	private Matrix4d formAlgebraicMatrix(VectorNd v)
-	{
+	private Matrix4d formAlgebraicMatrix(VectorNd v) {
 		// a =
 		// [ Ax^2 2Dxy 2Exz 2Gx ]
 		// [ 2Dxy By^2 2Fyz 2Hy ]
@@ -213,6 +233,5 @@ public class FitElilipsoid {
 
 		return a;
 	}
-
 
 }
