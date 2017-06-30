@@ -217,7 +217,7 @@ public class Matrix4d {
 	}
 
 	public Tuple3d getRowVector3(){
-		return new Tuple3d(m41, 42, 43);
+		return new Tuple3d(m41, m42, m43);
 	}
 
 	/**

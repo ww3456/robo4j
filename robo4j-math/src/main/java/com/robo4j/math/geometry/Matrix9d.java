@@ -34,9 +34,7 @@ public class Matrix9d implements Matrix {
     }
 
     public Matrix9d(double[][] data){
-        if(checkRowColumn(data.length, data[0].length)){
-            this.data = data;
-        }
+        this.data = data;
     }
 
     @Override
@@ -61,21 +59,23 @@ public class Matrix9d implements Matrix {
         return data[row][column];
     }
 
+    @Override
     public Matrix9d transpose(){
-        double[][] temp = new double[DIMENSION][DIMENSION];
+        double[][] temp = new double[DIMENSION][data[0].length];
         for (int i = 0; i < DIMENSION; i++)
-            for (int j = 0; j < DIMENSION; j++)
+            for (int j = 0; j < data[0].length; j++)
                 temp[j][i] = data[i][j];
         return new Matrix9d(temp);
     }
 
-    public Matrix9d multiply(Matrix9d m){
+    @Override
+    public Matrix multiply(Matrix m){
 
         double[][] tmp = new double[DIMENSION][DIMENSION];
         for(int i = 0; i < DIMENSION; i++) {         // rows from current matrix
             for(int j = 0; j < DIMENSION; j++) {     // columns matrix m
                 for(int k = 0; k < DIMENSION; k++) { // columns from current matrix
-                    tmp[i][j] += data[i][k] * m.getElement(k,j);
+                    tmp[i][j] += data[i][k] * ((Matrix9d)m).getElement(k,j);
                 }
             }
         }
@@ -84,6 +84,27 @@ public class Matrix9d implements Matrix {
 
     public VectorNd operate(double[] v){
         if(v.length != DIMENSION) {
+            throw new RoboOutOfRangeException("dimension mismatch");
+        } else {
+            double[] result = new double[DIMENSION];
+
+            for(int row = 0; row < DIMENSION; ++row) {
+                double[] dataRow = data[row];
+                double sum = 0.0D;
+
+                for(int i = 0; i < DIMENSION; ++i) {
+                    sum += dataRow[i] * v[i];
+                }
+
+                result[row] = sum;
+            }
+
+            return new VectorNd(result);
+        }
+    }
+
+    public VectorNd operate(double[] v, int columns){
+        if(v.length != columns) {
             throw new RoboOutOfRangeException("dimension mismatch");
         } else {
             double[] result = new double[DIMENSION];

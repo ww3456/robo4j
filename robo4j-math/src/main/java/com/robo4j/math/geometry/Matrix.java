@@ -27,4 +27,8 @@ public interface Matrix {
 
     int getDimension();
 
+    Matrix multiply(Matrix m);
+
+    Matrix transpose();
+
 }

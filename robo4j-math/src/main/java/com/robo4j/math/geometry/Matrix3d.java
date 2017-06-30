@@ -50,6 +50,17 @@ public class Matrix3d implements Matrix {
 		this.m31 = m31;
 		this.m32 = m32;
 		this.m33 = m33;
+		data[0][0] = m11;
+		data[0][1] = m12;
+		data[0][2] = m13;
+
+		data[1][0] = m21;
+		data[1][1] = m22;
+		data[1][2] = m23;
+
+		data[2][0] = m31;
+		data[2][1] = m32;
+		data[2][2] = m33;
 	}
 
 	public Matrix3d(double[] matrix) {
@@ -65,6 +76,19 @@ public class Matrix3d implements Matrix {
 		m31 = matrix[6];
 		m32 = matrix[7];
 		m33 = matrix[8];
+	}
+
+	public Matrix3d(double[][] matrix) {
+		m11 = matrix[0][0];
+		m12 = matrix[0][1];
+		m13 = matrix[0][2];
+		m21 = matrix[1][0];
+		m22 = matrix[1][1];
+		m23 = matrix[1][2];
+		m31 = matrix[2][0];
+		m32 = matrix[2][1];
+		m33 = matrix[2][2];
+		fitData();
 	}
 
 	@Override
@@ -146,10 +170,30 @@ public class Matrix3d implements Matrix {
 		return new Tuple3d(x, y, z);
 	}
 
+	@Override
+	public Matrix multiply(Matrix m){
+
+		double[][] tmp = new double[DIMENSION][DIMENSION];
+		for(int i = 0; i < DIMENSION; i++) {         // rows from current matrix
+			for(int j = 0; j < DIMENSION; j++) {     // columns matrix m
+				for(int k = 0; k < DIMENSION; k++) { // columns from current matrix
+					tmp[i][j] += data[i][k] * ((Matrix3d)m).getElement(k,j);
+				}
+			}
+		}
+		return new Matrix3d(tmp[0][0],tmp[0][1],tmp[0][2],
+				tmp[1][0],tmp[1][1],tmp[1][2], tmp[2][0],tmp[2][1],tmp[2][2]);
+	}
+
+	public double getElement(int row, int column){
+		return data[row][column];
+	}
+
 	/**
 	 * Transposes the matrix.
 	 */
-	public Matrix3d transpose() {
+	@Override
+	public Matrix transpose() {
 		double tmp = m12;
 		m12 = m21;
 		m21 = tmp;

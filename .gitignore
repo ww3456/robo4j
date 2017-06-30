@@ -4,4 +4,6 @@ licence.idea
 /.gradle/
 /build/
 *.bak
+.idea
+*.iml
 

@@ -25,25 +25,22 @@ import java.util.List;
  */
 public class EllipsoidFitTest {
 
-    private static final List<Tuple3d> CONTROL_ELLIPSOID_POINTS = new ArrayList<>();
-    static {
-        CONTROL_ELLIPSOID_POINTS.add(new Tuple3d(1.218234969106912, 1.5622932396950777, 2.908127141636472));
-        CONTROL_ELLIPSOID_POINTS.add(new Tuple3d(3.406914196934893, 2.0905555158425777, 1.9887962320370343));
-        CONTROL_ELLIPSOID_POINTS.add(new Tuple3d(2.2647839110418686, 2.2647839110418686, 3.153654761400918));
-        CONTROL_ELLIPSOID_POINTS.add(new Tuple3d(2.0624005905759786, 1.96337625716086, 3.200989974576277));
-        CONTROL_ELLIPSOID_POINTS.add(new Tuple3d(2.0624005905759786, 1.96337625716086, 3.200989974576277));
-        CONTROL_ELLIPSOID_POINTS.add(new Tuple3d(2.0624005905759786, 1.96337625716086, 3.200989974576277));
-        CONTROL_ELLIPSOID_POINTS.add(new Tuple3d(2.0624005905759786, 1.96337625716086, 3.200989974576277));
-        CONTROL_ELLIPSOID_POINTS.add(new Tuple3d(2.0624005905759786, 1.96337625716086, 3.200989974576277));
-        CONTROL_ELLIPSOID_POINTS.add(new Tuple3d(2.0624005905759786, 1.96337625716086, 3.200989974576277));
-        CONTROL_ELLIPSOID_POINTS.add(new Tuple3d(2.0624005905759786, 1.96337625716086, 3.200989974576277));
-        CONTROL_ELLIPSOID_POINTS.add(new Tuple3d(2.0624005905759786, 1.96337625716086, 3.200989974576277));
-        CONTROL_ELLIPSOID_POINTS.add(new Tuple3d(2.0624005905759786, 1.96337625716086, 3.200989974576277));
-        CONTROL_ELLIPSOID_POINTS.add(new Tuple3d(2.0624005905759786, 1.96337625716086, 3.200989974576277));
-        CONTROL_ELLIPSOID_POINTS.add(new Tuple3d(2.0624005905759786, 1.96337625716086, 3.200989974576277));
+    // This ellipsoid will be scaled back to the sphere
+    static double A_CONTROL_ELLIPSE = 1.4;
+    static double B_CONTROL_ELLIPSE = 1.3;
+    static double C_CONTROL_ELLIPSE = 1.2;
+    static double SHIFT_X_CONTROL_ELLIPSE = 2;
+    static double SHIFT_Y_CONTROL_ELLIPSE = 2;
+    static double SHIFT_Z_CONTROL_ELLIPSE = 2;
+    static double NOISE_INTENSITY = 0.01;
 
-    }
+    // Generates points for plots.
+    static SampleDataGenerator pointGenerator = new SampleDataGenerator();
 
+    private static final List<Tuple3d> CONTROL_ELLIPSOID_POINTS = pointGenerator.generatePoints(
+            A_CONTROL_ELLIPSE, B_CONTROL_ELLIPSE, C_CONTROL_ELLIPSE,
+            SHIFT_X_CONTROL_ELLIPSE, SHIFT_Y_CONTROL_ELLIPSE,
+            SHIFT_Z_CONTROL_ELLIPSE, NOISE_INTENSITY);
 
 
     public static void main(String[] args) {
@@ -57,6 +54,9 @@ public class EllipsoidFitTest {
 
         System.out.println("CENTER: " + ellipsoidFit.center);
         System.out.println("RADII: " + ellipsoidFit.radii);
+        System.out.println("evecs0: " + ellipsoidFit.evecs0);
+        System.out.println("evecs1: " + ellipsoidFit.evecs1);
+        System.out.println("evecs2: " + ellipsoidFit.evecs2);
     }
 
 }

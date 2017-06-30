@@ -17,6 +17,8 @@
 
 package com.robo4j.math.geometry;
 
+import java.util.stream.Stream;
+
 /**
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
@@ -45,6 +47,12 @@ public class VectorNd {
 
     public double getEntry(int i){
 		return data[i];
+	}
+
+	public void mapAddToSelf(int number){
+		for(int i=0; i < data.length; i++){
+			data[i] = number;
+		}
 	}
 
 }

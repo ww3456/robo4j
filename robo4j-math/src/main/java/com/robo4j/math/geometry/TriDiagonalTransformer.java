@@ -58,7 +58,7 @@ public class TriDiagonalTransformer {
 
     public Matrix3d getQ() {
         if(this.cachedQ == null) {
-            this.cachedQ = this.getQT().transpose();
+            this.cachedQ = (Matrix3d) this.getQT().transpose();
         }
 
         return this.cachedQ;

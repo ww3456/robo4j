@@ -55,8 +55,9 @@ public class EigenDecomposition {
         secondary = transformer.getSecondary();
     }
 
-    private void findEigenVectors(double[][] householderMatrix){
-        double[][] z = householderMatrix.clone();
+    private void findEigenVectors(double[][] householderMatrix) {
+
+        double[][] z = (double[][])householderMatrix.clone();
         int n = this.main.length;
         this.realEigenvalues = new double[n];
         this.imagEigenvalues = new double[n];
@@ -110,6 +111,7 @@ public class EigenDecomposition {
 
                 if(m != j) {
 
+
                     ++i;
                     q = (this.realEigenvalues[j + 1] - this.realEigenvalues[j]) / (2.0D * e[j]);
                     double t = Math.sqrt(1.0D + q * q);
@@ -123,40 +125,39 @@ public class EigenDecomposition {
                     double s = 1.0D;
                     double c = 1.0D;
 
-                    int i1;
-                    for(i1 = m - 1; i1 >= j; --i1) {
-                        double p = s * e[i1];
-                        double h = c * e[i1];
+                    for(i = m - 1; i >= j; --i) {
+                        double p = s * e[i];
+                        double h = c * e[i];
                         if(Math.abs(p) >= Math.abs(q)) {
                             c = q / p;
                             t = Math.sqrt(c * c + 1.0D);
-                            e[i1 + 1] = p * t;
+                            e[i + 1] = p * t;
                             s = 1.0D / t;
                             c *= s;
                         } else {
                             s = p / q;
                             t = Math.sqrt(s * s + 1.0D);
-                            e[i1 + 1] = q * t;
+                            e[i + 1] = q * t;
                             c = 1.0D / t;
                             s *= c;
                         }
 
-                        if(e[i1 + 1] == 0.0D) {
-                            this.realEigenvalues[i1 + 1] -= u;
+                        if(e[i + 1] == 0.0D) {
+                            this.realEigenvalues[i + 1] -= u;
                             e[m] = 0.0D;
                             break;
                         }
 
-                        q = this.realEigenvalues[i1 + 1] - u;
-                        t = (this.realEigenvalues[i1] - q) * s + 2.0D * c * h;
+                        q = this.realEigenvalues[i + 1] - u;
+                        t = (this.realEigenvalues[i] - q) * s + 2.0D * c * h;
                         u = s * t;
-                        this.realEigenvalues[i1 + 1] = q + u;
+                        this.realEigenvalues[i + 1] = q + u;
                         q = c * t - h;
 
                         for(int ia = 0; ia < n; ++ia) {
-                            p = z[ia][i1 + 1];
-                            z[ia][i1 + 1] = s * z[ia][i1] + c * p;
-                            z[ia][i1] = c * z[ia][i1] - s * p;
+                            p = z[ia][i + 1];
+                            z[ia][i + 1] = s * z[ia][i] + c * p;
+                            z[ia][i] = c * z[ia][i] - s * p;
                         }
                     }
 
@@ -173,22 +174,21 @@ public class EigenDecomposition {
             i = j;
             double p = this.realEigenvalues[j];
 
-            int j1;
-            for(j1 = j + 1; j1 < n; ++j1) {
-                if(this.realEigenvalues[j1] > p) {
-                    i = j1;
-                    p = this.realEigenvalues[j1];
+            for(j = j + 1; j < n; ++j) {
+                if(this.realEigenvalues[j] > p) {
+                    i = j;
+                    p = this.realEigenvalues[j];
                 }
             }
 
-            if(i != j1) {
-                this.realEigenvalues[i] = this.realEigenvalues[j1];
-                this.realEigenvalues[j1] = p;
+            if(i != j) {
+                this.realEigenvalues[i] = this.realEigenvalues[--j];
+                this.realEigenvalues[j] = p;
 
-                for(j1 = 0; j1 < n; ++j) {
-                    p = z[j1][j1];
-                    z[j1][j1] = z[j1][i];
-                    z[j1][i] = p;
+                for(j = 0; j < n; ++j) {
+                    p = z[j][j];
+                    z[j][j] = z[j][i];
+                    z[j][i] = p;
                 }
             }
         }
@@ -218,5 +218,6 @@ public class EigenDecomposition {
 
             this.eigenvectors[i] = tmp.clone();
         }
+
     }
 }

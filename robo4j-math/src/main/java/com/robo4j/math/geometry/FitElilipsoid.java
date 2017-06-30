@@ -87,6 +87,7 @@ public class FitElilipsoid {
 		evecs2 = ed.getEigenvector(2);
 
 		// Find the radii of the ellipsoid.
+		//TODO : bug is here
 		radii = findRadii(evals);
 	}
 
@@ -104,7 +105,9 @@ public class FitElilipsoid {
 
 		// radii[i] = sqrt(1/eval[i]);
 		for (int i = 0; i < evals.length; i++) {
-			radii[i] = Math.sqrt(1 / evals[i]);
+			double number = 1d / Math.abs(evals[i]);
+			double tmp = Math.sqrt(number);
+			radii[i] = tmp;
 		}
 
 		return new Tuple3d(radii);
@@ -117,6 +120,7 @@ public class FitElilipsoid {
 
 		Tuple3d subV = a.getRowVector3();
 		// inv (dtd)
+		//TODO: bug is here
 		DecompositionSolver solver = new SingularDecompositionSolver(subA).getSolver();
 
 		Matrix3d subAi = (Matrix3d) solver.getInverse();
@@ -182,12 +186,15 @@ public class FitElilipsoid {
 		// solve the normal system of equations
 		// v = (( d' * d )^-1) * ( d' * ones.mapAddToSelf(1));
 
-		Matrix9d dtd = d.transpose().multiply(d);
+		Matrix9d dtdTranspose = d.transpose();
+		Matrix9d dtd = (Matrix9d)dtdTranspose.multiply(d);
 		VectorNd ones = new VectorNd(pointNumbers);
+		ones.mapAddToSelf(1);
 
 		// Multiply: d' * ones.mapAddToSelf(1)
 		Matrix9d transposeMatrix9d = d.transpose();
-		VectorNd dtOnes = transposeMatrix9d.operate(ones.gedDataRef());
+		VectorNd dtOnes = transposeMatrix9d.operate(ones.gedDataRef(), ones.gedDataRef().length);
+
 
 		// Find ( d' * d )^-1
 		DecompositionSolver solver = new SingularDecompositionSolver(dtd).getSolver();
@@ -195,7 +202,8 @@ public class FitElilipsoid {
 		 Matrix9d dtdi = (Matrix9d) solver.getInverse();
 
 		// v = (( d' * d )^-1) * ( d' * ones.mapAddToSelf(1));
-		 return dtdi.operate(dtOnes.gedDataRef());
+
+		return dtdi.operate(dtOnes.gedDataRef());
 	}
 
 	/**
@@ -214,22 +222,65 @@ public class FitElilipsoid {
 		// [ 2Gx 2Hy 2Iz -1 ] ]
 		Matrix4d a = new Matrix4d();
 
+//		a.setEntry(0, 0, v.getEntry(0));
+//		a.setEntry(0, 1, v.getEntry(3));
+//		a.setEntry(0, 2, v.getEntry(4));
+//		a.setEntry(0, 3, v.getEntry(6));
+
+//		a.setEntry(1, 0, v.getEntry(3));
+//		a.setEntry(1, 1, v.getEntry(1));
+//		a.setEntry(1, 2, v.getEntry(5));
+//		a.setEntry(1, 3, v.getEntry(7));
+
+//		a.setEntry(2, 0, v.getEntry(4));
+//		a.setEntry(2, 1, v.getEntry(5));
+//		a.setEntry(2, 2, v.getEntry(2));
+//		a.setEntry(2, 3, v.getEntry(8));
+//		a.setEntry(3, 0, v.getEntry(6));
+//		a.setEntry(3, 1, v.getEntry(7));
+//		a.setEntry(3, 2, v.getEntry(8));
+//		a.setEntry(3, 3, -1);
+
 		a.m11 = v.getEntry(0);
 		a.m12 = v.getEntry(3);
 		a.m13 = v.getEntry(4);
 		a.m14 = v.getEntry(6);
+
 		a.m21 = v.getEntry(3);
 		a.m22 = v.getEntry(1);
 		a.m23 = v.getEntry(5);
 		a.m24 = v.getEntry(7);
+
 		a.m31 = v.getEntry(4);
 		a.m32 = v.getEntry(5);
 		a.m33 = v.getEntry(2);
-		a.m24 = v.getEntry(8);
+		a.m34 = v.getEntry(8);
+
 		a.m41 = v.getEntry(6);
 		a.m42 = v.getEntry(7);
 		a.m43 = v.getEntry(8);
-		a.m44 = v.getEntry(-1);
+		a.m44 = -1;
+
+
+		a.setElement(0,0, a.m11);
+		a.setElement(0,1, a.m12);
+		a.setElement(0,2, a.m13);
+		a.setElement(0,3, a.m14);
+
+		a.setElement(1,0, a.m21);
+		a.setElement(1,1, a.m22);
+		a.setElement(1,2, a.m23);
+		a.setElement(1,3, a.m24);
+
+		a.setElement(2,0, a.m31);
+		a.setElement(2,1, a.m32);
+		a.setElement(2,2, a.m33);
+		a.setElement(2,3, a.m34);
+
+		a.setElement(3,0, a.m41);
+		a.setElement(3,1, a.m42);
+		a.setElement(3,2, a.m43);
+		a.setElement(3,3, a.m44);
 
 		return a;
 	}
