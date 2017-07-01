@@ -44,7 +44,7 @@ public class TriDiagonalTransformer {
         this.cachedQt = null;
         this.cachedT = null;
 
-        this.transform();
+        transform();
 
     }
 
@@ -108,65 +108,71 @@ public class TriDiagonalTransformer {
         return this.cachedQt;
     }
 
+    /**
+     * Transform original matrix to tridiagonal form.
+     * <p>Transformation is done using Householder transforms.</p>
+     */
     private void transform() {
-        int m = this.householderVectors.length;
-        double[] z = new double[m];
+        final int m = householderVectors.length;
+        final double[] z = new double[m];
+        for (int k = 0; k < m - 1; k++) {
 
-        for(int k = 0; k < m - 1; ++k) {
-            double[] hK = this.householderVectors[k];
-            this.main[k] = hK[k];
-            double xNormSqr = 0.0D;
-
-            for(int j = k + 1; j < m; ++j) {
-                double c = hK[j];
+            //zero-out a row and a column simultaneously
+            final double[] hK = householderVectors[k];
+            main[k] = hK[k];
+            double xNormSqr = 0;
+            for (int j = k + 1; j < m; ++j) {
+                final double c = hK[j];
                 xNormSqr += c * c;
             }
+            final double a = (hK[k + 1] > 0) ? - Math.sqrt(xNormSqr) : Math.sqrt(xNormSqr);
+            secondary[k] = a;
+            if (a != 0.0) {
+                // apply Householder transform from left and right simultaneously
 
-            double a = hK[k + 1] > 0.0D?-Math.sqrt(xNormSqr):Math.sqrt(xNormSqr);
-            this.secondary[k] = a;
-            if(a != 0.0D) {
                 hK[k + 1] -= a;
-                double beta = -1.0D / (a * hK[k + 1]);
-                Arrays.fill(z, k + 1, m, 0.0D);
+                final double beta = -1 / (a * hK[k + 1]);
 
-                for(int i = k + 1; i < m; ++i) {
-                    double[] hI = this.householderVectors[i];
-                    double hKI = hK[i];
+                // compute a = beta A v, where v is the Householder vector
+                // this loop is written in such a way
+                //   1) only the upper triangular part of the matrix is accessed
+                //   2) access is cache-friendly for a matrix stored in rows
+                Arrays.fill(z, k + 1, m, 0);
+                for (int i = k + 1; i < m; ++i) {
+                    final double[] hI = householderVectors[i];
+                    final double hKI = hK[i];
                     double zI = hI[i] * hKI;
-
-                    for(int j = i + 1; j < m; ++j) {
-                        double hIJ = hI[j];
-                        zI += hIJ * hK[j];
+                    for (int j = i + 1; j < m; ++j) {
+                        final double hIJ = hI[j];
+                        zI   += hIJ * hK[j];
                         z[j] += hIJ * hKI;
                     }
-
                     z[i] = beta * (z[i] + zI);
                 }
 
-                double gamma = 0.0D;
-
-                int i;
-                for(i = k + 1; i < m; ++i) {
+                // compute gamma = beta vT z / 2
+                double gamma = 0;
+                for (int i = k + 1; i < m; ++i) {
                     gamma += z[i] * hK[i];
                 }
+                gamma *= beta / 2;
 
-                gamma *= beta / 2.0D;
-
-                for(i = k + 1; i < m; ++i) {
+                // compute z = z - gamma v
+                for (int i = k + 1; i < m; ++i) {
                     z[i] -= gamma * hK[i];
                 }
 
-                for(i = k + 1; i < m; ++i) {
-                    double[] hI = this.householderVectors[i];
-
-                    for(int j = i; j < m; ++j) {
+                // update matrix: A = A - v zT - z vT
+                // only the upper triangular part of the matrix is updated
+                for (int i = k + 1; i < m; ++i) {
+                    final double[] hI = householderVectors[i];
+                    for (int j = i; j < m; ++j) {
                         hI[j] -= hK[i] * z[j] + z[i] * hK[j];
                     }
                 }
             }
         }
-
-        this.main[m - 1] = this.householderVectors[m - 1][m - 1];
+        main[m - 1] = householderVectors[m - 1][m - 1];
     }
 
 

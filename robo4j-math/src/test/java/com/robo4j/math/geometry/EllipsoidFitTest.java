@@ -18,6 +18,8 @@ package com.robo4j.math.geometry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Marcus Hirt (@hirt)
@@ -54,6 +56,11 @@ public class EllipsoidFitTest {
 
         System.out.println("CENTER: " + ellipsoidFit.center);
         System.out.println("RADII: " + ellipsoidFit.radii);
+
+        for(double d: ellipsoidFit.evals){
+            System.out.println("value: " + d);
+        }
+
         System.out.println("evecs0: " + ellipsoidFit.evecs0);
         System.out.println("evecs1: " + ellipsoidFit.evecs1);
         System.out.println("evecs2: " + ellipsoidFit.evecs2);

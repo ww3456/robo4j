@@ -23,7 +23,7 @@ package com.robo4j.math.geometry;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Matrix4d {
+public class Matrix4d implements Matrix{
 	private static final int DIMENSION = 4;
 	private double[][] data = new double[DIMENSION][DIMENSION];
 	public double m11;
@@ -88,6 +88,12 @@ public class Matrix4d {
 		m44 = matrix[15];
 	}
 
+	@Override
+	public int getDimension() {
+		return DIMENSION;
+	}
+
+	@Override
 	public void fitData(){
 		data[0][0] = m11;
 		data[0][1] = m12;
@@ -110,10 +116,12 @@ public class Matrix4d {
 		data[3][3] = m44;
 	}
 
+	@Override
 	public double[][] getData(){
 		return data;
 	}
 
+	@Override
 	public void adjustValues(){
 		m11 = data[0][0];
 		m12 = data[0][1];
@@ -160,25 +168,34 @@ public class Matrix4d {
 		double tmp = m12;
 		m12 = m21;
 		m21 = tmp;
+
 		tmp = m13;
 		m13 = m31;
 		m31 = tmp;
+
 		tmp = m14;
 		m14 = m41;
 		m41 = tmp;
+
 		tmp = m23;
 		m23 = m32;
 		m32 = tmp;
+
+		tmp = m24;
+		m24 = m42;
+		m42 = tmp;
+
 		tmp = m34;
 		m34 = m43;
 		m43 = tmp;
+
 		return this;
 	}
 
 	public void setSubmatrixL3F0(Tuple3d tuple3d){
-		m31 = tuple3d.x;
-		m32 = tuple3d.y;
-		m33 = tuple3d.z;
+		m41 = tuple3d.x;
+		m42 = tuple3d.y;
+		m43 = tuple3d.z;
 	}
 
 	/**
@@ -196,10 +213,11 @@ public class Matrix4d {
 		return new Tuple4d(x, y, z, t);
 	}
 
-	public Matrix4d multiply(Matrix4d m){
+	public Matrix4d multiply(Matrix m){
 
 		Matrix4d out = new Matrix4d();
 		this.fitData();
+		m.fitData();
 		for(int row = 0; row < DIMENSION; ++row) {
 			for(int col = 0; col < DIMENSION; ++col) {
 				double sum = 0.0D;
@@ -235,7 +253,7 @@ public class Matrix4d {
 	@Override
 	public String toString() {
 		return String.format(
-				"m11:%f, m12:%f, m13:%f, m14:%f, m21:%f, m22:%f, m23:%f, m24:%f, m31:%f, m32:%f, m33:%f, m34:%f, m41:%f, 42:%f, m43:%f, m44:%f",
+				"{m11:%f, m12:%f, m13:%f, m14:%f;\n m21:%f, m22:%f, m23:%f, m24:%f;\n m31:%f, m32:%f, m33:%f, m34:%f;\n m41:%f, 42:%f, m43:%f, m44:%f}",
 				m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44);
 	}
 }

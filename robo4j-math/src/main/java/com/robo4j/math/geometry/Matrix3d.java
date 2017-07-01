@@ -111,6 +111,10 @@ public class Matrix3d implements Matrix {
 		return DIMENSION;
 	}
 
+	/**
+	 * add data to internal array structure
+	 */
+	@Override
 	public void fitData() {
 		data[0][0] = m11;
 		data[0][1] = m12;
@@ -126,6 +130,10 @@ public class Matrix3d implements Matrix {
 
 	}
 
+	/**
+	 * internal array structure  to values
+	 */
+	@Override
 	public void adjustValues() {
 		m11 = data[0][0];
 		m12 = data[0][1];
@@ -172,7 +180,6 @@ public class Matrix3d implements Matrix {
 
 	@Override
 	public Matrix multiply(Matrix m){
-
 		double[][] tmp = new double[DIMENSION][DIMENSION];
 		for(int i = 0; i < DIMENSION; i++) {         // rows from current matrix
 			for(int j = 0; j < DIMENSION; j++) {     // columns matrix m

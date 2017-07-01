@@ -19,6 +19,8 @@ package com.robo4j.math.geometry;
 
 import com.robo4j.math.RoboOutOfRangeException;
 
+import java.util.Arrays;
+
 /**
  *
  * @see FitElilipsoid
@@ -122,6 +124,24 @@ public class Matrix9d implements Matrix {
 
             return new VectorNd(result);
         }
+    }
+
+    @Override
+    public void fitData() {
+        throw new RuntimeException("not implemented");
+    }
+
+    @Override
+    public void adjustValues() {
+        throw new RuntimeException("not implemented");
+    }
+
+
+    @Override
+    public String toString() {
+        return "Matrix9d{" +
+                "data=" + Arrays.toString(data) +
+                '}';
     }
 
     //Private Methods

@@ -40,7 +40,7 @@ public class FitElilipsoid {
 	public Tuple3d evecs1;
 	public Tuple3d evecs2;
 
-	private double[] evals;
+	public double[] evals;
 
 	public FitElilipsoid() {
 	}
@@ -74,10 +74,13 @@ public class FitElilipsoid {
 		double divr = -r.getData()[3][3];
 		for (int i = 0; i < subr.getDimension(); i++) {
 			for (int j = 0; j < subr.getDimension(); j++) {
-				subr.setElement(i, j, subr.getData()[i][j] / divr);
+				double tmp = subr.getData()[i][j] / divr;
+				subr.setElement(i, j, tmp);
+				subr.adjustValues();
 			}
 		}
 		// adjust data to m_xy values
+
 		subr.adjustValues();
 
 		EigenDecomposition ed = new EigenDecomposition(subr, 0);
@@ -87,11 +90,28 @@ public class FitElilipsoid {
 		evecs2 = ed.getEigenvector(2);
 
 		// Find the radii of the ellipsoid.
-		//TODO : bug is here
 		radii = findRadii(evals);
 	}
 
 	// Private Methods
+
+	private Matrix3d createSubMatrix(Matrix4d centerMatrix){
+		// Generate a submatrix of r.
+		Matrix3d result = centerMatrix.getSubMatrix3d0();
+
+		// subr[i][j] = subr[i][j] / -r[3][3]).
+		result.fitData(); // set internal data value storage
+		double divr = -centerMatrix.getData()[3][3];
+		for (int i = 0; i < result.getDimension(); i++) {
+			for (int j = 0; j < result.getDimension(); j++) {
+				result.setElement(i, j, result.getData()[i][j] / divr);
+			}
+		}
+		// adjust data to m_xy values
+
+		result.adjustValues();
+		return result;
+	}
 
 	/**
 	 * Find the radii of the ellipsoid in ascending order.
@@ -100,17 +120,16 @@ public class FitElilipsoid {
 	 *            the eigenvalues of the ellipsoid.
 	 * @return the radii of the ellipsoid.
 	 */
-	private Tuple3d findRadii(double[] evals) {
+	public Tuple3d findRadii(double[] evals) {
 		double[] radii = new double[evals.length];
 
 		// radii[i] = sqrt(1/eval[i]);
 		for (int i = 0; i < evals.length; i++) {
-			double number = 1d / Math.abs(evals[i]);
-			double tmp = Math.sqrt(number);
-			radii[i] = tmp;
+			radii[i] =Math.sqrt(1 / evals[i]);
 		}
 
-		return new Tuple3d(radii);
+		Tuple3d result = new Tuple3d(radii);
+		return result;
 	}
 
 	private Tuple3d findCenter(Matrix4d a) {
@@ -129,7 +148,8 @@ public class FitElilipsoid {
 		return new Tuple3d(resultVector.gedDataRef());
 	}
 
-	private Matrix4d translateToCenter(Tuple3d center, Matrix4d a) {
+	public Matrix4d translateToCenter(Tuple3d center, Matrix4d a) {
+		a.fitData();
 		// Form the corresponding translation matrix.
 		Matrix4d t = Matrix4d.createIdentity();
 
@@ -139,9 +159,14 @@ public class FitElilipsoid {
 		centerMatrix.set(center);
 
 		t.setSubmatrixL3F0(centerMatrix);
+		t.fitData();
 
 		// Translate to the center.
-		Matrix4d r = t.multiply(a).multiply(t.transpose());
+		Matrix4d tmp1 = t.multiply(a);
+		Matrix4d transposeT = t.transpose();
+		transposeT.fitData();
+
+		Matrix4d r = tmp1.multiply(transposeT);
 
 		return r;
 	}
