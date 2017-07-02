@@ -27,7 +27,7 @@ public class MatrixMathTest {
 
 
     @Test
-    public void multiply1(){
+    public void multiplyMatrix4d(){
 
         Matrix4d matrix4d1 = new Matrix4d(1,2,0,0,0,1,0,0,0,0,1,0,0,0,2,1);
         Matrix4d matrix4d2 = new Matrix4d(1,2,0,0,0,1,0,0,0,0,1,0,0,0,2,1);
@@ -36,6 +36,10 @@ public class MatrixMathTest {
         Matrix4d result = matrix4d1.multiply(matrix4d2).multiply(matrix4d2);
 
         System.out.println("Result : " + result);
+    }
+
+    @Test void multiplyMatrix3d(){
+
     }
 
     @Test

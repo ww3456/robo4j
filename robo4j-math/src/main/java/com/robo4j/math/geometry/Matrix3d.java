@@ -107,7 +107,12 @@ public class Matrix3d implements Matrix {
 	}
 
 	@Override
-	public int getDimension() {
+	public int getRows() {
+		return DIMENSION;
+	}
+
+	@Override
+	public int getColumns() {
 		return DIMENSION;
 	}
 
@@ -160,8 +165,11 @@ public class Matrix3d implements Matrix {
 	 *            the tuple to multiply with this matrix.
 	 */
 	public void transform(Tuple3d tuple) {
-		tuple.set(m11 * tuple.x + m12 * tuple.y + m13 * tuple.z, m21 * tuple.x + m22 * tuple.y + m23 * tuple.z,
+		//@format:off
+		tuple.set(m11 * tuple.x + m12 * tuple.y + m13 * tuple.z,
+				m21 * tuple.x + m22 * tuple.y + m23 * tuple.z,
 				m31 * tuple.x + m32 * tuple.y + m33 * tuple.z);
+		//@format:on
 	}
 
 	/**
@@ -180,20 +188,59 @@ public class Matrix3d implements Matrix {
 
 	@Override
 	public Matrix multiply(Matrix m){
-		double[][] tmp = new double[DIMENSION][DIMENSION];
-		for(int i = 0; i < DIMENSION; i++) {         // rows from current matrix
-			for(int j = 0; j < DIMENSION; j++) {     // columns matrix m
-				for(int k = 0; k < DIMENSION; k++) { // columns from current matrix
-					tmp[i][j] += data[i][k] * ((Matrix3d)m).getElement(k,j);
-				}
-			}
-		}
-		return new Matrix3d(tmp[0][0],tmp[0][1],tmp[0][2],
-				tmp[1][0],tmp[1][1],tmp[1][2], tmp[2][0],tmp[2][1],tmp[2][2]);
+		double r11 = m11*m.getValue(0,0 ) + m12 * m.getValue(1,0) + m13 * m.getValue(2,0);
+		double r12 = m11*m.getValue(0,1 ) + m12 * m.getValue(1,1) + m13 * m.getValue(2,1);
+		double r13 = m11*m.getValue(0,2 ) + m12 * m.getValue(1,2) + m13 * m.getValue(2,2);
+
+		double r21 = m21*m.getValue(0,0 ) + m22 * m.getValue(1,0) + m23 * m.getValue(2,0);
+		double r22 = m21*m.getValue(0,1 ) + m22 * m.getValue(1,1) + m23 * m.getValue(2,1);
+		double r23 = m21*m.getValue(0,2 ) + m22 * m.getValue(1,2) + m23 * m.getValue(2,2);
+
+		double r31 = m31*m.getValue(0,0 ) + m32 * m.getValue(1,0) + m33 * m.getValue(2,0);
+		double r32 = m31*m.getValue(0,1 ) + m32 * m.getValue(1,1) + m33 * m.getValue(2,1);
+		double r33 = m31*m.getValue(0,2 ) + m32 * m.getValue(1,2) + m33 * m.getValue(2,2);
+		return new Matrix3d(r11,r12,r13,r21,r22,r23,r31,r32,r33);
 	}
 
-	public double getElement(int row, int column){
-		return data[row][column];
+	@Override
+	public double getValue(int row, int column) {
+		switch (row) {
+			case 0:
+				switch (column) {
+					case 0:
+						return m11;
+					case 1:
+						return m12;
+					case 2:
+						return m13;
+					default:
+						throw new IllegalArgumentException("Column does not exist: " + column);
+				}
+			case 1:
+				switch (column) {
+					case 0:
+						return m21;
+					case 1:
+						return m22;
+					case 2:
+						return m23;
+					default:
+						throw new IllegalArgumentException("Column does not exist: " + column);
+				}
+			case 2:
+				switch (column) {
+					case 0:
+						return m31;
+					case 1:
+						return m32;
+					case 2:
+						return m33;
+					default:
+						throw new IllegalArgumentException("Column does not exist: " + column);
+				}
+			default:
+				throw new IllegalArgumentException("Row does not exist: " + row);
+		}
 	}
 
 	/**
@@ -252,6 +299,62 @@ public class Matrix3d implements Matrix {
 
 			return new VectorNd(result);
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		long temp;
+		temp = Double.doubleToLongBits(m11);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m12);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m13);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m21);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m22);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m23);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m31);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m32);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m33);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Matrix3d other = (Matrix3d) obj;
+		if (Double.doubleToLongBits(m11) != Double.doubleToLongBits(other.m11))
+			return false;
+		if (Double.doubleToLongBits(m12) != Double.doubleToLongBits(other.m12))
+			return false;
+		if (Double.doubleToLongBits(m13) != Double.doubleToLongBits(other.m13))
+			return false;
+		if (Double.doubleToLongBits(m21) != Double.doubleToLongBits(other.m21))
+			return false;
+		if (Double.doubleToLongBits(m22) != Double.doubleToLongBits(other.m22))
+			return false;
+		if (Double.doubleToLongBits(m23) != Double.doubleToLongBits(other.m23))
+			return false;
+		if (Double.doubleToLongBits(m31) != Double.doubleToLongBits(other.m31))
+			return false;
+		if (Double.doubleToLongBits(m32) != Double.doubleToLongBits(other.m32))
+			return false;
+		if (Double.doubleToLongBits(m33) != Double.doubleToLongBits(other.m33))
+			return false;
+		return true;
 	}
 
 	@Override

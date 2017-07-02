@@ -72,8 +72,8 @@ public class FitElilipsoid {
 		// subr[i][j] = subr[i][j] / -r[3][3]).
 		r.fitData(); // set internal data value storage
 		double divr = -r.getData()[3][3];
-		for (int i = 0; i < subr.getDimension(); i++) {
-			for (int j = 0; j < subr.getDimension(); j++) {
+		for (int i = 0; i < subr.getRows(); i++) {
+			for (int j = 0; j < subr.getColumns(); j++) {
 				double tmp = subr.getData()[i][j] / divr;
 				subr.setElement(i, j, tmp);
 				subr.adjustValues();
@@ -102,8 +102,8 @@ public class FitElilipsoid {
 		// subr[i][j] = subr[i][j] / -r[3][3]).
 		result.fitData(); // set internal data value storage
 		double divr = -centerMatrix.getData()[3][3];
-		for (int i = 0; i < result.getDimension(); i++) {
-			for (int j = 0; j < result.getDimension(); j++) {
+		for (int i = 0; i < result.getRows(); i++) {
+			for (int j = 0; j < result.getColumns(); j++) {
 				result.setElement(i, j, result.getData()[i][j] / divr);
 			}
 		}
@@ -186,7 +186,7 @@ public class FitElilipsoid {
 		// init design matrix 9x9
 		Matrix9d d = new Matrix9d();
 
-		for (int i = 0; i < d.getDimension(); i++) {
+		for (int i = 0; i < d.getRows(); i++) {
 			double xx = Math.pow(input.get(i).x, 2);
 			double yy = Math.pow(input.get(i).y, 2);
 			double zz = Math.pow(input.get(i).z, 2);
@@ -246,25 +246,6 @@ public class FitElilipsoid {
 		// [ 2Exz 2Fyz Cz^2 2Iz ]
 		// [ 2Gx 2Hy 2Iz -1 ] ]
 		Matrix4d a = new Matrix4d();
-
-//		a.setEntry(0, 0, v.getEntry(0));
-//		a.setEntry(0, 1, v.getEntry(3));
-//		a.setEntry(0, 2, v.getEntry(4));
-//		a.setEntry(0, 3, v.getEntry(6));
-
-//		a.setEntry(1, 0, v.getEntry(3));
-//		a.setEntry(1, 1, v.getEntry(1));
-//		a.setEntry(1, 2, v.getEntry(5));
-//		a.setEntry(1, 3, v.getEntry(7));
-
-//		a.setEntry(2, 0, v.getEntry(4));
-//		a.setEntry(2, 1, v.getEntry(5));
-//		a.setEntry(2, 2, v.getEntry(2));
-//		a.setEntry(2, 3, v.getEntry(8));
-//		a.setEntry(3, 0, v.getEntry(6));
-//		a.setEntry(3, 1, v.getEntry(7));
-//		a.setEntry(3, 2, v.getEntry(8));
-//		a.setEntry(3, 3, -1);
 
 		a.m11 = v.getEntry(0);
 		a.m12 = v.getEntry(3);

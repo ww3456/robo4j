@@ -25,7 +25,15 @@ public interface Matrix {
 
     double[][] getData();
 
-    int getDimension();
+    /**
+     * @return the number of elements in the matrix.
+     */
+    int getRows();
+
+    /**
+     * @return the number of columns in the matrix.
+     */
+    int getColumns();
 
     Matrix multiply(Matrix m);
 
@@ -35,4 +43,5 @@ public interface Matrix {
 
     void adjustValues();
 
+    double getValue(int row, int column);
 }

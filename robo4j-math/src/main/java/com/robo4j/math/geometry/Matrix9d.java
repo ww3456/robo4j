@@ -40,7 +40,12 @@ public class Matrix9d implements Matrix {
     }
 
     @Override
-    public int getDimension(){
+    public int getRows() {
+        return DIMENSION;
+    }
+
+    @Override
+    public int getColumns() {
         return DIMENSION;
     }
 
@@ -124,6 +129,11 @@ public class Matrix9d implements Matrix {
 
             return new VectorNd(result);
         }
+    }
+
+    @Override
+    public double getValue(int row, int column) {
+        return 0;
     }
 
     @Override

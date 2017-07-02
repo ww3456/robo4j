@@ -37,7 +37,7 @@ public class SingularDecompositionSolver {
     public SingularDecompositionSolver(Matrix matrix) {
 
         double[][] A = matrix.getData();
-        this.n = matrix.getDimension();
+        this.n = matrix.getRows();
 
         this.singularValues = new double[this.n];
         double[][] U = new double[this.n][this.n];
@@ -424,7 +424,7 @@ public class SingularDecompositionSolver {
 
             this.tol = max((double) this.n * this.singularValues[0] * 2.220446049250313E-16D, Math.sqrt(2.2250738585072014E-308D));
 
-            switch (matrix.getDimension()) {
+            switch (matrix.getRows()) {
                 case 3:
                     this.cachedU = new Matrix3d(U);
                     this.cachedV = new Matrix3d(V);
@@ -593,7 +593,7 @@ public class SingularDecompositionSolver {
             }
 
 
-            switch (v.getDimension()) {
+            switch (v.getRows()) {
                 case 3:
                     this.pseudoInverse = v.multiply(new Matrix3d(suT));
                     this.nonSingular = nonSingular;

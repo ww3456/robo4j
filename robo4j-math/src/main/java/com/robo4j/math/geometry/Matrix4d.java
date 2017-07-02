@@ -23,7 +23,7 @@ package com.robo4j.math.geometry;
  * @author Marcus Hirt (@hirt)
  * @author Miroslav Wengner (@miragemiko)
  */
-public class Matrix4d implements Matrix{
+public class Matrix4d implements Matrix {
 	private static final int DIMENSION = 4;
 	private double[][] data = new double[DIMENSION][DIMENSION];
 	public double m11;
@@ -46,8 +46,8 @@ public class Matrix4d implements Matrix{
 	public Matrix4d() {
 	}
 
-	public Matrix4d(double m11, double m12, double m13, double m14, double m21, double m22, double m23, double m24, double m31, double m32, double m33,
-					double m34, double m41, double m42, double m43, double m44) {
+	public Matrix4d(double m11, double m12, double m13, double m14, double m21, double m22, double m23, double m24,
+			double m31, double m32, double m33, double m34, double m41, double m42, double m43, double m44) {
 		this.m11 = m11;
 		this.m12 = m12;
 		this.m13 = m13;
@@ -89,12 +89,17 @@ public class Matrix4d implements Matrix{
 	}
 
 	@Override
-	public int getDimension() {
+	public int getRows() {
 		return DIMENSION;
 	}
 
 	@Override
-	public void fitData(){
+	public int getColumns() {
+		return DIMENSION;
+	}
+
+	@Override
+	public void fitData() {
 		data[0][0] = m11;
 		data[0][1] = m12;
 		data[0][2] = m13;
@@ -117,12 +122,12 @@ public class Matrix4d implements Matrix{
 	}
 
 	@Override
-	public double[][] getData(){
+	public double[][] getData() {
 		return data;
 	}
 
 	@Override
-	public void adjustValues(){
+	public void adjustValues() {
 		m11 = data[0][0];
 		m12 = data[0][1];
 		m13 = data[0][2];
@@ -144,8 +149,76 @@ public class Matrix4d implements Matrix{
 		m44 = data[3][3];
 	}
 
-	public void setElement(int row, int column, double val){
+	public void setElement(int row, int column, double val) {
 		data[row][column] = val;
+	}
+
+	/**
+	 * Returns the value for the row and the column.
+	 *
+	 * @param row
+	 *            the row
+	 * @param column
+	 *            the column
+	 * @return
+	 */
+	public double getValue(int row, int column) {
+		switch (row) {
+			case 0:
+				switch (column) {
+					case 0:
+						return m11;
+					case 1:
+						return m12;
+					case 2:
+						return m13;
+					case 3:
+						return m14;
+					default:
+						throw new IllegalArgumentException("Column does not exist: " + column);
+				}
+			case 1:
+				switch (column) {
+					case 0:
+						return m21;
+					case 1:
+						return m22;
+					case 2:
+						return m23;
+					case 3:
+						return m24;
+					default:
+						throw new IllegalArgumentException("Column does not exist: " + column);
+				}
+			case 2:
+				switch (column) {
+					case 0:
+						return m31;
+					case 1:
+						return m32;
+					case 2:
+						return m33;
+					case 3:
+						return m34;
+					default:
+						throw new IllegalArgumentException("Column does not exist: " + column);
+				}
+			case 3:
+				switch (column) {
+					case 0:
+						return m41;
+					case 1:
+						return m42;
+					case 2:
+						return m43;
+					case 3:
+						return m44;
+					default:
+						throw new IllegalArgumentException("Column does not exist: " + column);
+				}
+			default:
+				throw new IllegalArgumentException("Row does not exist: " + row);
+		}
 	}
 
 	/**
@@ -192,7 +265,7 @@ public class Matrix4d implements Matrix{
 		return this;
 	}
 
-	public void setSubmatrixL3F0(Tuple3d tuple3d){
+	public void setSubmatrixL3F0(Tuple3d tuple3d) {
 		m41 = tuple3d.x;
 		m42 = tuple3d.y;
 		m43 = tuple3d.z;
@@ -213,28 +286,35 @@ public class Matrix4d implements Matrix{
 		return new Tuple4d(x, y, z, t);
 	}
 
-	public Matrix4d multiply(Matrix m){
+	public Matrix4d multiply(Matrix m) {
 
-		Matrix4d out = new Matrix4d();
-		this.fitData();
-		m.fitData();
-		for(int row = 0; row < DIMENSION; ++row) {
-			for(int col = 0; col < DIMENSION; ++col) {
-				double sum = 0.0D;
+		double r11 = m11 * m.getValue(0, 0) + m12 * m.getValue(1, 0) + m13 * m.getValue(2, 0) + m14 * m.getValue(3, 0);
+		double r12 = m11 * m.getValue(0, 1) + m12 * m.getValue(1, 1) + m13 * m.getValue(2, 1) + m14 * m.getValue(3, 1);
+		double r13 = m11 * m.getValue(0, 2) + m12 * m.getValue(1, 2) + m13 * m.getValue(2, 2) + m14 * m.getValue(3, 2);
+		double r14 = m11 * m.getValue(0, 3) + m12 * m.getValue(1, 3) + m13 * m.getValue(2, 3) + m14 * m.getValue(3, 3);
 
-				for(int i = 0; i < DIMENSION; ++i) {
-					sum += data[row][i] * m.getData()[i][col];
-				}
+		double r21 = m21 * m.getValue(0, 0) + m22 * m.getValue(1, 0) + m23 * m.getValue(2, 0) + m24 * m.getValue(3, 0);
+		double r22 = m21 * m.getValue(0, 1) + m22 * m.getValue(1, 1) + m23 * m.getValue(2, 1) + m24 * m.getValue(3, 1);
+		double r23 = m21 * m.getValue(0, 2) + m22 * m.getValue(1, 2) + m23 * m.getValue(2, 2) + m24 * m.getValue(3, 2);
+		double r24 = m21 * m.getValue(0, 3) + m22 * m.getValue(1, 3) + m23 * m.getValue(2, 3) + m24 * m.getValue(3, 3);
 
-				out.setElement(row, col, sum);
-			}
-		}
+		double r31 = m31 * m.getValue(0, 0) + m32 * m.getValue(1, 0) + m33 * m.getValue(2, 0) + m34 * m.getValue(3, 0);
+		double r32 = m31 * m.getValue(0, 1) + m32 * m.getValue(1, 1) + m33 * m.getValue(2, 1) + m34 * m.getValue(3, 1);
+		double r33 = m31 * m.getValue(0, 2) + m32 * m.getValue(1, 2) + m33 * m.getValue(2, 2) + m34 * m.getValue(3, 2);
+		double r34 = m31 * m.getValue(0, 3) + m32 * m.getValue(1, 3) + m33 * m.getValue(2, 3) + m34 * m.getValue(3, 3);
 
-		out.adjustValues();
-		return out;
+		double r41 = m41 * m.getValue(0, 0) + m42 * m.getValue(1, 0) + m43 * m.getValue(2, 0) + m44 * m.getValue(3, 0);
+		double r42 = m41 * m.getValue(0, 1) + m42 * m.getValue(1, 1) + m43 * m.getValue(2, 1) + m44 * m.getValue(3, 1);
+		double r43 = m41 * m.getValue(0, 2) + m42 * m.getValue(1, 2) + m43 * m.getValue(2, 2) + m44 * m.getValue(3, 2);
+		double r44 = m41 * m.getValue(0, 3) + m42 * m.getValue(1, 3) + m43 * m.getValue(2, 3) + m44 * m.getValue(3, 3);
+
+		Matrix4d result =  new Matrix4d(r11, r12, r13, r14, r21, r22, r23, r24, r31, r32, r33, r34, r41, r42, r43, r44);
+		result.fitData();
+
+		return new Matrix4d(r11, r12, r13, r14, r21, r22, r23, r24, r31, r32, r33, r34, r41, r42, r43, r44);
 	}
 
-	public Tuple3d getRowVector3(){
+	public Tuple3d getRowVector3() {
 		return new Tuple3d(m41, m42, m43);
 	}
 
@@ -248,6 +328,91 @@ public class Matrix4d implements Matrix{
 	// submatrix starts from 0,0
 	public Matrix3d getSubMatrix3d0() {
 		return new Matrix3d(m11, m12, m13, m21, m22, m23, m31, m32, m33);
+	}
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		long temp;
+		temp = Double.doubleToLongBits(m11);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m12);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m13);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m14);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m21);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m22);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m23);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m24);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m31);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m32);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m33);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m34);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m41);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m42);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m43);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(m44);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Matrix4d other = (Matrix4d) obj;
+		if (Double.doubleToLongBits(m11) != Double.doubleToLongBits(other.m11))
+			return false;
+		if (Double.doubleToLongBits(m12) != Double.doubleToLongBits(other.m12))
+			return false;
+		if (Double.doubleToLongBits(m13) != Double.doubleToLongBits(other.m13))
+			return false;
+		if (Double.doubleToLongBits(m14) != Double.doubleToLongBits(other.m14))
+			return false;
+		if (Double.doubleToLongBits(m21) != Double.doubleToLongBits(other.m21))
+			return false;
+		if (Double.doubleToLongBits(m22) != Double.doubleToLongBits(other.m22))
+			return false;
+		if (Double.doubleToLongBits(m23) != Double.doubleToLongBits(other.m23))
+			return false;
+		if (Double.doubleToLongBits(m24) != Double.doubleToLongBits(other.m24))
+			return false;
+		if (Double.doubleToLongBits(m31) != Double.doubleToLongBits(other.m31))
+			return false;
+		if (Double.doubleToLongBits(m32) != Double.doubleToLongBits(other.m32))
+			return false;
+		if (Double.doubleToLongBits(m33) != Double.doubleToLongBits(other.m33))
+			return false;
+		if (Double.doubleToLongBits(m34) != Double.doubleToLongBits(other.m34))
+			return false;
+		if (Double.doubleToLongBits(m41) != Double.doubleToLongBits(other.m41))
+			return false;
+		if (Double.doubleToLongBits(m42) != Double.doubleToLongBits(other.m42))
+			return false;
+		if (Double.doubleToLongBits(m43) != Double.doubleToLongBits(other.m43))
+			return false;
+		if (Double.doubleToLongBits(m44) != Double.doubleToLongBits(other.m44))
+			return false;
+		return true;
 	}
 
 	@Override

@@ -16,10 +16,7 @@
  */
 package com.robo4j.math.geometry;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Marcus Hirt (@hirt)
