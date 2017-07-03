@@ -55,8 +55,7 @@ public class FitElilipsoid {
 	 */
 	void fitEllipsoid(List<Tuple3d> ellipsoidInput) {
 
-		// v is the vector of 9 elements
-		VectorNd v = solveInputs(ellipsoidInput);
+		Tuple9d v = solveInputs(ellipsoidInput);
 
 		// Form the algebraic form of the ellipsoid.
 		Matrix4d a = formAlgebraicMatrix(v);
@@ -129,8 +128,7 @@ public class FitElilipsoid {
 			radii[i] =Math.sqrt(1 / evals[i]);
 		}
 
-		Tuple3d result = new Tuple3d(radii);
-		return result;
+		return new Tuple3d(radii);
 	}
 
 	private Tuple3d findCenter(Matrix4d a) {
@@ -138,16 +136,15 @@ public class FitElilipsoid {
 		Matrix3d subA = a.getSubMatrix3d0();
 		subA.multiplyByFactor(-1.0);
 
+		// create sub vector
 		Tuple3d subV = a.getRowVector3();
 		// inv (dtd)
-		//TODO: bug is here
 		DecompositionSolver solver = new SingularDecompositionSolver(subA).getSolver();
 
 		Matrix3d subAi = (Matrix3d) solver.getInverse();
 
-		// resultVector is the vector of 3 elements
-		VectorNd resultVector = subAi.operate(subV.getRefData());
-		return new Tuple3d(resultVector.gedDataRef());
+		// subAi(3x3)*subVector(3)' = result
+		return subAi.operateMultiplyByVector3(subV);
 	}
 
 	public Matrix4d translateToCenter(Tuple3d center, Matrix4d a) {
@@ -181,7 +178,7 @@ public class FitElilipsoid {
 	 *            represent points in 3D
 	 * @return
 	 */
-	private VectorNd solveInputs(List<Tuple3d> input) {
+	private Tuple9d solveInputs(List<Tuple3d> input) {
 
 		final int pointNumbers = input.size();
 
@@ -220,18 +217,17 @@ public class FitElilipsoid {
 		// Multiply: d' * ones.mapAddToSelf(1)
 		Matrix9d transposeMatrix9d = d.transpose();
 
-		// dtOnes is the vector of 9-elements
-		VectorNd dtOnes = transposeMatrix9d.operateVector9d();
-
+		// Matrix(9x9) * IdentVector(9)' = dtOnes
+		Tuple9d ones9 = new Tuple9d(1,1,1,1,1,1,1,1,1);
+		Tuple9d dtOnes = transposeMatrix9d.operateMultiplyByVector9(ones9);
 
 		// Find ( d' * d )^-1
 		DecompositionSolver solver = new SingularDecompositionSolver(dtd).getSolver();
 
-		 Matrix9d dtdi = (Matrix9d) solver.getInverse();
+		Matrix9d dtdi = (Matrix9d) solver.getInverse();
 
-		// v = (( d' * d )^-1) * ( d' * ones.mapAddToSelf(1));
-
-		return dtdi.operate(dtOnes.gedDataRef());
+		// v = (( d' * d )^-1) * ( d' * IdentityVectory(9));
+		return dtdi.operateMultiplyByVector9(dtOnes);
 	}
 
 	/**
@@ -242,7 +238,7 @@ public class FitElilipsoid {
 	 *            the vector polynomial.
 	 * @return the matrix of the algebraic form of the polynomial.
 	 */
-	private Matrix4d formAlgebraicMatrix(VectorNd v) {
+	private Matrix4d formAlgebraicMatrix(Tuple9d v) {
 		// a =
 		// [ Ax^2 2Dxy 2Exz 2Gx ]
 		// [ 2Dxy By^2 2Fyz 2Hy ]
@@ -250,46 +246,28 @@ public class FitElilipsoid {
 		// [ 2Gx 2Hy 2Iz -1 ] ]
 		Matrix4d a = new Matrix4d();
 
-		a.m11 = v.getEntry(0);
-		a.m12 = v.getEntry(3);
-		a.m13 = v.getEntry(4);
-		a.m14 = v.getEntry(6);
+		a.m11 = v.x1;    //v.getEntry(0);
+		a.m12 = v.x4;    //v.getEntry(3);
+		a.m13 = v.x5;    //v.getEntry(4);
+		a.m14 = v.x7;	//v.getEntry(6);
 
-		a.m21 = v.getEntry(3);
-		a.m22 = v.getEntry(1);
-		a.m23 = v.getEntry(5);
-		a.m24 = v.getEntry(7);
+		a.m21 = v.x4;	//v.getEntry(3);
+		a.m22 = v.x2;	//v.getEntry(1);
+		a.m23 = v.x6;	//v.getEntry(5);
+		a.m24 = v.x8;	//v.getEntry(7);
 
-		a.m31 = v.getEntry(4);
-		a.m32 = v.getEntry(5);
-		a.m33 = v.getEntry(2);
-		a.m34 = v.getEntry(8);
+		a.m31 = v.x5;	//v.getEntry(4);
+		a.m32 = v.x6;	//v.getEntry(5);
+		a.m33 = v.x3;	//v.getEntry(2);
+		a.m34 = v.x9;	//v.getEntry(8);
 
-		a.m41 = v.getEntry(6);
-		a.m42 = v.getEntry(7);
-		a.m43 = v.getEntry(8);
+		a.m41 = v.x7;	//v.getEntry(6);
+		a.m42 = v.x8;	//v.getEntry(7);
+		a.m43 = v.x9;	//v.getEntry(8);
 		a.m44 = -1;
 
-
-		a.setElement(0,0, a.m11);
-		a.setElement(0,1, a.m12);
-		a.setElement(0,2, a.m13);
-		a.setElement(0,3, a.m14);
-
-		a.setElement(1,0, a.m21);
-		a.setElement(1,1, a.m22);
-		a.setElement(1,2, a.m23);
-		a.setElement(1,3, a.m24);
-
-		a.setElement(2,0, a.m31);
-		a.setElement(2,1, a.m32);
-		a.setElement(2,2, a.m33);
-		a.setElement(2,3, a.m34);
-
-		a.setElement(3,0, a.m41);
-		a.setElement(3,1, a.m42);
-		a.setElement(3,2, a.m43);
-		a.setElement(3,3, a.m44);
+		//FIXME : remove
+		a.fitData();
 
 		return a;
 	}

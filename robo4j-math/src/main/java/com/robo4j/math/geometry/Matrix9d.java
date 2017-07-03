@@ -90,50 +90,29 @@ public class Matrix9d implements Matrix {
 		return new Matrix9d(tmp);
 	}
 
-	public VectorNd operate(double[] v) {
-		if (v.length != DIMENSION) {
-			throw new RoboOutOfRangeException("dimension mismatch");
-		} else {
-			double[] result = new double[DIMENSION];
+    /**
+     * Result =Matrix(9x9) * OnesVector(9)'
+     *
+     * create vector
+     */
+    public Tuple9d operateMultiplyByVector9(Tuple9d v) {
 
-			for (int row = 0; row < DIMENSION; ++row) {
-				double[] dataRow = data[row];
-				double sum = 0.0D;
+            double r1 = data[0][0]*v.x1 + data[0][1]*v.x2 + data[0][2]*v.x3 + data[0][3]*v.x4 + data[0][4]*v.x5 + data[0][5]*v.x6 + data[0][6]*v.x7 + data[0][7]*v.x8 + data[0][8]*v.x9;
+            double r2 = data[1][0]*v.x1 + data[1][1]*v.x2 + data[1][2]*v.x3 + data[1][3]*v.x4 + data[1][4]*v.x5 + data[1][5]*v.x6 + data[1][6]*v.x7 + data[1][7]*v.x8 + data[1][8]*v.x9;
+            double r3 = data[2][0]*v.x1 + data[2][1]*v.x2 + data[2][2]*v.x3 + data[2][3]*v.x4 + data[2][4]*v.x5 + data[2][5]*v.x6 + data[2][6]*v.x7 + data[2][7]*v.x8 + data[2][8]*v.x9;
+            double r4 = data[3][0]*v.x1 + data[3][1]*v.x2 + data[3][2]*v.x3 + data[3][3]*v.x4 + data[3][4]*v.x5 + data[3][5]*v.x6 + data[3][6]*v.x7 + data[3][7]*v.x8 + data[3][8]*v.x9;
+            double r5 = data[4][0]*v.x1 + data[4][1]*v.x2 + data[4][2]*v.x3 + data[4][3]*v.x4 + data[4][4]*v.x5 + data[4][5]*v.x6 + data[4][6]*v.x7 + data[4][7]*v.x8 + data[4][8]*v.x9;
+            double r6 = data[5][0]*v.x1 + data[5][1]*v.x2 + data[5][2]*v.x3 + data[5][3]*v.x4 + data[5][4]*v.x5 + data[5][5]*v.x6 + data[5][6]*v.x7 + data[5][7]*v.x8 + data[5][8]*v.x9;
+            double r7 = data[6][0]*v.x1 + data[6][1]*v.x2 + data[6][2]*v.x3 + data[6][3]*v.x4 + data[6][4]*v.x5 + data[6][5]*v.x6 + data[6][6]*v.x7 + data[6][7]*v.x8 + data[6][8]*v.x9;
+            double r8 = data[7][0]*v.x1 + data[7][1]*v.x2 + data[7][2]*v.x3 + data[7][3]*v.x4 + data[7][4]*v.x5 + data[7][5]*v.x6 + data[7][6]*v.x7 + data[7][7]*v.x8 + data[7][8]*v.x9;
+            double r9 = data[8][0]*v.x1 + data[8][1]*v.x2 + data[8][2]*v.x3 + data[8][3]*v.x4 + data[8][4]*v.x5 + data[8][5]*v.x6 + data[8][6]*v.x7 + data[8][7]*v.x8 + data[8][8]*v.x9;
 
-				for (int i = 0; i < DIMENSION; ++i) {
-					sum += dataRow[i] * v[i];
-				}
-
-				result[row] = sum;
-			}
-
-			return new VectorNd(result);
-		}
-	}
-
-	/**
-	 * create vector
-	 */
-	public VectorNd operateVector9d() {
-        double[] result = new double[DIMENSION];
-
-        for (int row = 0; row < DIMENSION; ++row) {
-            double[] dataRow = data[row];
-            double sum = 0.0D;
-
-            for (int i = 0; i < DIMENSION; ++i) {
-                sum += dataRow[i];
-            }
-
-            result[row] = sum;
-        }
-
-        return new VectorNd(result);
-	}
+            return new Tuple9d(r1, r2, r3, r4, r5, r6, r7, r8, r9);
+    }
 
 	@Override
 	public double getValue(int row, int column) {
-		return 0;
+        throw new RuntimeException("not implemented");
 	}
 
 	@Override

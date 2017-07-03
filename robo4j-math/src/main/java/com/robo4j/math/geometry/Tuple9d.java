@@ -48,6 +48,10 @@ public class Tuple9d {
         this.x9 = x9;
     }
 
+    public double[] getDataRef(){
+        return new double[]{x1,x2,x3,x4,x5,x6,x7,x8,x9};
+    }
+
 
     @Override
     public boolean equals(Object o) {

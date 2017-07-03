@@ -16,8 +16,6 @@
  */
 package com.robo4j.math.geometry;
 
-import com.robo4j.math.RoboOutOfRangeException;
-
 /**
  * A three dimensional matrix.
  * 
@@ -279,26 +277,11 @@ public class Matrix3d implements Matrix {
 		m33 = factor * m33;
 	}
 
-	public VectorNd operate(double[] v) {
-		double[][] tmpData = getData();
-		if (v.length != DIMENSION) {
-			throw new RoboOutOfRangeException("dimension mismatch");
-		} else {
-			double[] result = new double[DIMENSION];
-
-			for (int row = 0; row < DIMENSION; ++row) {
-				double[] dataRow = tmpData[row];
-				double sum = 0.0D;
-
-				for (int i = 0; i < DIMENSION; ++i) {
-					sum += dataRow[i] * v[i];
-				}
-
-				result[row] = sum;
-			}
-
-			return new VectorNd(result);
-		}
+	public Tuple3d operateMultiplyByVector3(Tuple3d v) {
+		double r1 = data[0][0]*v.x + data[0][1]*v.y + data[0][2]*v.z;
+		double r2 = data[1][0]*v.x + data[1][1]*v.y + data[1][2]*v.z;
+		double r3 = data[2][0]*v.x + data[2][1]*v.y + data[2][2]*v.z;
+		return new Tuple3d(r1, r2, r3);
 	}
 
 	@Override
