@@ -55,6 +55,7 @@ public class FitElilipsoid {
 	 */
 	void fitEllipsoid(List<Tuple3d> ellipsoidInput) {
 
+		// v is the vector of 9 elements
 		VectorNd v = solveInputs(ellipsoidInput);
 
 		// Form the algebraic form of the ellipsoid.
@@ -144,6 +145,7 @@ public class FitElilipsoid {
 
 		Matrix3d subAi = (Matrix3d) solver.getInverse();
 
+		// resultVector is the vector of 3 elements
 		VectorNd resultVector = subAi.operate(subV.getRefData());
 		return new Tuple3d(resultVector.gedDataRef());
 	}
@@ -213,12 +215,13 @@ public class FitElilipsoid {
 
 		Matrix9d dtdTranspose = d.transpose();
 		Matrix9d dtd = (Matrix9d)dtdTranspose.multiply(d);
-		VectorNd ones = new VectorNd(pointNumbers);
-		ones.mapAddToSelf(1);
+		//ones is vector of entry elements N~1000
 
 		// Multiply: d' * ones.mapAddToSelf(1)
 		Matrix9d transposeMatrix9d = d.transpose();
-		VectorNd dtOnes = transposeMatrix9d.operate(ones.gedDataRef(), ones.gedDataRef().length);
+
+		// dtOnes is the vector of 9-elements
+		VectorNd dtOnes = transposeMatrix9d.operateVector9d();
 
 
 		// Find ( d' * d )^-1
