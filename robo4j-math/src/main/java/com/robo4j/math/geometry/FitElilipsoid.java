@@ -94,7 +94,7 @@ public class FitElilipsoid {
 
 		// radii[i] = sqrt(1/eval[i]);
 		for (int i = 0; i < evals.length; i++) {
-			radii[i] =Math.sqrt(1 / evals[i]);
+			radii[i] = Math.sqrt(1 / evals[i]);
 		}
 
 		return new Tuple3d(radii);
@@ -117,26 +117,11 @@ public class FitElilipsoid {
 	}
 
 	public Matrix4d translateToCenter(Tuple3d center, Matrix4d a) {
-		a.fitData();
 		// Form the corresponding translation matrix.
 		Matrix4d t = Matrix4d.createIdentity();
-
-		Tuple3d centerMatrix = new Tuple3d();
-
-		// centerMatrix.setRowVector(0, center);
-		centerMatrix.set(center);
-
-		t.setSubmatrixL3F0(centerMatrix);
-		t.fitData();
-
+		t.setSubmatrixL3F0(center);
 		// Translate to the center.
-		Matrix4d tmp1 = t.multiply(a);
-		Matrix4d transposeT = t.transpose();
-		transposeT.fitData();
-
-		Matrix4d r = tmp1.multiply(transposeT);
-
-		return r;
+		return t.multiply(a).multiply(t.transpose());
 	}
 
 	/**
@@ -178,14 +163,14 @@ public class FitElilipsoid {
 		// v = (( d' * d )^-1) * ( d' * ones.mapAddToSelf(1));
 
 		Matrix9d dtdTranspose = d.transpose();
-		Matrix9d dtd = (Matrix9d)dtdTranspose.multiply(d);
-		//ones is vector of entry elements N~1000
+		Matrix9d dtd = (Matrix9d) dtdTranspose.multiply(d);
+		// ones is vector of entry elements N~1000
 
 		// Multiply: d' * ones.mapAddToSelf(1)
 		Matrix9d transposeMatrix9d = d.transpose();
 
 		// Matrix(9x9) * IdentVector(9)' = dtOnes
-		Tuple9d ones9 = new Tuple9d(1,1,1,1,1,1,1,1,1);
+		Tuple9d ones9 = new Tuple9d(1, 1, 1, 1, 1, 1, 1, 1, 1);
 		Tuple9d dtOnes = transposeMatrix9d.operateMultiplyByVector9(ones9);
 
 		// Find ( d' * d )^-1
@@ -211,12 +196,8 @@ public class FitElilipsoid {
 		// [ 2Dxy By^2 2Fyz 2Hy ]
 		// [ 2Exz 2Fyz Cz^2 2Iz ]
 		// [ 2Gx 2Hy 2Iz -1 ] ]
-		Matrix4d a = new Matrix4d(v.x1, v.x4, v.x5, v.x7, v.x4, v.x2, v.x6, v.x8, v.x5, v.x6, v.x3, v.x9, v.x7, v.x8, v.x9, -1);
-
-		//FIXME : remove
-		a.fitData();
-
-		return a;
+		return new Matrix4d(v.x1, v.x4, v.x5, v.x7, v.x4, v.x2, v.x6, v.x8, v.x5, v.x6, v.x3, v.x9, v.x7, v.x8, v.x9,
+				-1);
 	}
 
 }

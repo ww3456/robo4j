@@ -68,9 +68,9 @@ public class Matrix9d implements Matrix {
 
 	@Override
 	public Matrix9d transpose() {
-		double[][] temp = new double[DIMENSION][data[0].length];
+		double[][] temp = new double[DIMENSION][DIMENSION];
 		for (int i = 0; i < DIMENSION; i++)
-			for (int j = 0; j < data[0].length; j++)
+			for (int j = 0; j < DIMENSION; j++)
 				temp[j][i] = data[i][j];
 		return new Matrix9d(temp);
 	}

@@ -262,7 +262,7 @@ public class Matrix4d implements Matrix {
 		m34 = m43;
 		m43 = tmp;
 
-		return this;
+		return new Matrix4d(m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44);
 	}
 
 	public void setSubmatrixL3F0(Tuple3d tuple3d) {
@@ -307,9 +307,6 @@ public class Matrix4d implements Matrix {
 		double r42 = m41 * m.getValue(0, 1) + m42 * m.getValue(1, 1) + m43 * m.getValue(2, 1) + m44 * m.getValue(3, 1);
 		double r43 = m41 * m.getValue(0, 2) + m42 * m.getValue(1, 2) + m43 * m.getValue(2, 2) + m44 * m.getValue(3, 2);
 		double r44 = m41 * m.getValue(0, 3) + m42 * m.getValue(1, 3) + m43 * m.getValue(2, 3) + m44 * m.getValue(3, 3);
-
-		Matrix4d result =  new Matrix4d(r11, r12, r13, r14, r21, r22, r23, r24, r31, r32, r33, r34, r41, r42, r43, r44);
-		result.fitData();
 
 		return new Matrix4d(r11, r12, r13, r14, r21, r22, r23, r24, r31, r32, r33, r34, r41, r42, r43, r44);
 	}

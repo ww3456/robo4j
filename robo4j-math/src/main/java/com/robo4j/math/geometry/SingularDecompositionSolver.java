@@ -458,34 +458,30 @@ public class SingularDecompositionSolver {
     }
 
     public DecompositionSolver getSolver() {
-
         return new SingularDecompositionSolver.Solver(this.singularValues, this.getUT(), this.cachedV,
                 this.getRank() == this.n, this.tol);
     }
 
     //FastMath
     private double hypot(double x, double y) {
-        if (!Double.isInfinite(x) && !Double.isInfinite(y)) {
-            if (!Double.isNaN(x) && !Double.isNaN(y)) {
-                int expX = getExponent(x);
-                int expY = getExponent(y);
-                if (expX > expY + 27) {
-                    return abs(x);
-                } else if (expY > expX + 27) {
-                    return abs(y);
-                } else {
-                    int middleExp = (expX + expY) / 2;
-                    double scaledX = scalb(x, -middleExp);
-                    double scaledY = scalb(y, -middleExp);
-                    double scaledH = Math.sqrt(scaledX * scaledX + scaledY * scaledY);
-                    return scalb(scaledH, middleExp);
-                }
+        if (!Double.isNaN(x) && !Double.isNaN(y)) {
+            int expX = getExponent(x);
+            int expY = getExponent(y);
+            if (expX > expY + 27) {
+                return abs(x);
+            } else if (expY > expX + 27) {
+                return abs(y);
             } else {
-                return 0.0D / 0.0;
+                int middleExp = (expX + expY) / 2;
+                double scaledX = scalb(x, -middleExp);
+                double scaledY = scalb(y, -middleExp);
+                double scaledH = Math.sqrt(scaledX * scaledX + scaledY * scaledY);
+                return scalb(scaledH, middleExp);
             }
         } else {
-            return 1.0D / 0.0;
+            return 0.0D / 0.0;
         }
+
     }
 
     private static int getExponent(double d) {
@@ -493,7 +489,7 @@ public class SingularDecompositionSolver {
     }
 
     private static double abs(double x) {
-        return x < 0.0D ? -x : (x == 0.0D ? 0.0D : x);
+        return x < 0 ? -x : x;
     }
 
     private static double scalb(double d, int n) {
@@ -501,9 +497,9 @@ public class SingularDecompositionSolver {
             return d * Double.longBitsToDouble((long) (n + 1023) << 52);
         } else if (!Double.isNaN(d) && !Double.isInfinite(d) && d != 0.0D) {
             if (n < -2098) {
-                return d > 0.0D ? 0.0D : -0.0D;
+                return d > 0 ? 0 : -0;
             } else if (n > 2097) {
-                return d > 0.0D ? 1.0D / 0.0 : -1.0D / 0.0;
+                return d > 0d ? 1 : -1;
             } else {
                 long bits = Double.doubleToLongBits(d);
                 long sign = bits & -9223372036854775808L;
@@ -526,7 +522,7 @@ public class SingularDecompositionSolver {
                         return sign == 0L ? 0.0D : -0.0D;
                     }
                 } else if (exponent != 0) {
-                    return scaledExponent < 2047 ? Double.longBitsToDouble(sign | (long) scaledExponent << 52 | mantissa) : (sign == 0L ? 1.0D / 0.0 : -1.0D / 0.0);
+                    return scaledExponent < 2047d ? Double.longBitsToDouble(sign | (long) scaledExponent << 52 | mantissa) : (sign == 0L ? 1 : -1);
                 } else {
                     while (mantissa >>> 52 != 1L) {
                         mantissa <<= 1;
@@ -535,7 +531,7 @@ public class SingularDecompositionSolver {
 
                     ++scaledExponent;
                     mantissa &= 4503599627370495L;
-                    return scaledExponent < 2047 ? Double.longBitsToDouble(sign | (long) scaledExponent << 52 | mantissa) : (sign == 0L ? 1.0D / 0.0 : -1.0D / 0.0);
+                    return scaledExponent < 2047d ? Double.longBitsToDouble(sign | (long) scaledExponent << 52 | mantissa) : (sign == 0L ? 1 : -1);
                 }
             }
         } else {
@@ -567,7 +563,6 @@ public class SingularDecompositionSolver {
 
     private static class Solver implements DecompositionSolver {
         private final Matrix pseudoInverse;
-        private boolean nonSingular;
 
         private Solver(double[] singularValues, Matrix uT, Matrix v, boolean nonSingular, double tol) {
             double[][] suT = uT.getData();
@@ -591,11 +586,9 @@ public class SingularDecompositionSolver {
             switch (v.getRows()) {
                 case 3:
                     this.pseudoInverse = v.multiply(new Matrix3d(suT));
-                    this.nonSingular = nonSingular;
                     break;
                 case 9:
                     this.pseudoInverse = v.multiply(new Matrix9d(suT));
-                    this.nonSingular = nonSingular;
                     break;
                 default:
                     throw new RuntimeException("not supported matrix operation");
