@@ -35,19 +35,10 @@ public class Tuple3d {
 		set(x, y, z);
 	}
 
-	public Tuple3d(Tuple3d val) {
-		set(val);
-	}
-
 	public Tuple3d(double[] data){
 		x = data[0];
 		y = data[1];
 		z = data[2];
-	}
-
-	public double[] getData(){
-		double[] result = {x, y, z};
-		return result;
 	}
 
 	public static Tuple3d createIdentity() {

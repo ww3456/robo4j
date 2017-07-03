@@ -32,7 +32,7 @@ public class EigenDecompositionTest {
     public void eigenVectorsTest1(){
 
         Matrix3d matrix3d = new Matrix3d(1,0,0,0,1,0,0,0,1);
-        EigenDecomposition ed = new EigenDecomposition(matrix3d, 0);
+        EigenDecomposition3 ed = new EigenDecomposition3(matrix3d);
 
         System.out.println("matrix: " + matrix3d);
         System.out.println("eigenValues: " + Stream.of(ed.getRealEigenvalues()).collect(Collectors.toList()));
@@ -50,7 +50,7 @@ public class EigenDecompositionTest {
                 1,7,3,
                 7,4,-5,
                 3,-5,6);
-        EigenDecomposition ed = new EigenDecomposition(matrix3d, 0);
+        EigenDecomposition3 ed = new EigenDecomposition3(matrix3d);
 
         System.out.println("matrix: " + matrix3d);
         System.out.println("eigenValues: " + Stream.of(ed.getRealEigenvalues()).collect(Collectors.toList()));
@@ -69,7 +69,7 @@ public class EigenDecompositionTest {
                 1,0,0,
                 0,1,0,
                 0,0,1);
-        EigenDecomposition ed = new EigenDecomposition(matrix3d, 0);
+        EigenDecomposition3 ed = new EigenDecomposition3(matrix3d);
 
 
 

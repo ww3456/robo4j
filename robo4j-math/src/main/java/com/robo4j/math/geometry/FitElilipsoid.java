@@ -64,26 +64,14 @@ public class FitElilipsoid {
 		center = findCenter(a);
 
 		// Translate the algebraic form of the ellipsoid to the center.
-		Matrix4d r = translateToCenter(center, a);
+		Matrix4d translatedCenter = translateToCenter(center, a);
 
 		// Generate a submatrix of r.
-		Matrix3d subr = r.getSubMatrix3d0();
+		Matrix3d tmpSubMatrix = translatedCenter.getSubMatrix3d0();
+		double divisor = -translatedCenter.m44;
+		Matrix3d subMatrixDiv = (Matrix3d) tmpSubMatrix.divideByNumber(divisor);
 
-		// subr[i][j] = subr[i][j] / -r[3][3]).
-		r.fitData(); // set internal data value storage
-		double divr = -r.getData()[3][3];
-		for (int i = 0; i < subr.getRows(); i++) {
-			for (int j = 0; j < subr.getColumns(); j++) {
-				double tmp = subr.getData()[i][j] / divr;
-				subr.setElement(i, j, tmp);
-				subr.adjustValues();
-			}
-		}
-		// adjust data to m_xy values
-
-		subr.adjustValues();
-
-		EigenDecomposition ed = new EigenDecomposition(subr, 0);
+		EigenDecomposition3 ed = new EigenDecomposition3(subMatrixDiv);
 		evals = ed.getRealEigenvalues();
 		evecs0 = ed.getEigenvector(0);
 		evecs1 = ed.getEigenvector(1);
@@ -94,25 +82,6 @@ public class FitElilipsoid {
 	}
 
 	// Private Methods
-
-	private Matrix3d createSubMatrix(Matrix4d centerMatrix){
-		// Generate a submatrix of r.
-		Matrix3d result = centerMatrix.getSubMatrix3d0();
-
-		// subr[i][j] = subr[i][j] / -r[3][3]).
-		result.fitData(); // set internal data value storage
-		double divr = -centerMatrix.getData()[3][3];
-		for (int i = 0; i < result.getRows(); i++) {
-			for (int j = 0; j < result.getColumns(); j++) {
-				result.setElement(i, j, result.getData()[i][j] / divr);
-			}
-		}
-		// adjust data to m_xy values
-
-		result.adjustValues();
-		return result;
-	}
-
 	/**
 	 * Find the radii of the ellipsoid in ascending order.
 	 * 
@@ -180,8 +149,6 @@ public class FitElilipsoid {
 	 */
 	private Tuple9d solveInputs(List<Tuple3d> input) {
 
-		final int pointNumbers = input.size();
-
 		// init design matrix 9x9
 		Matrix9d d = new Matrix9d();
 
@@ -244,27 +211,7 @@ public class FitElilipsoid {
 		// [ 2Dxy By^2 2Fyz 2Hy ]
 		// [ 2Exz 2Fyz Cz^2 2Iz ]
 		// [ 2Gx 2Hy 2Iz -1 ] ]
-		Matrix4d a = new Matrix4d();
-
-		a.m11 = v.x1;    //v.getEntry(0);
-		a.m12 = v.x4;    //v.getEntry(3);
-		a.m13 = v.x5;    //v.getEntry(4);
-		a.m14 = v.x7;	//v.getEntry(6);
-
-		a.m21 = v.x4;	//v.getEntry(3);
-		a.m22 = v.x2;	//v.getEntry(1);
-		a.m23 = v.x6;	//v.getEntry(5);
-		a.m24 = v.x8;	//v.getEntry(7);
-
-		a.m31 = v.x5;	//v.getEntry(4);
-		a.m32 = v.x6;	//v.getEntry(5);
-		a.m33 = v.x3;	//v.getEntry(2);
-		a.m34 = v.x9;	//v.getEntry(8);
-
-		a.m41 = v.x7;	//v.getEntry(6);
-		a.m42 = v.x8;	//v.getEntry(7);
-		a.m43 = v.x9;	//v.getEntry(8);
-		a.m44 = -1;
+		Matrix4d a = new Matrix4d(v.x1, v.x4, v.x5, v.x7, v.x4, v.x2, v.x6, v.x8, v.x5, v.x6, v.x3, v.x9, v.x7, v.x8, v.x9, -1);
 
 		//FIXME : remove
 		a.fitData();

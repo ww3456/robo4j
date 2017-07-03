@@ -200,6 +200,27 @@ public class Matrix3d implements Matrix {
 		return new Matrix3d(r11,r12,r13,r21,r22,r23,r31,r32,r33);
 	}
 
+	/**
+	 *
+	 * @param n division number N
+	 * @return divided matrix
+	 */
+	public Matrix divideByNumber(double divisor){
+		double r11 = m11 / divisor;
+		double r12 = m12/divisor;
+		double r13 = m13/divisor;
+
+		double r21 = m21/divisor;
+		double r22 = m22/divisor;
+		double r23 = m23/divisor;
+
+		double r31 = m31/divisor;
+		double r32 = m32/divisor;
+		double r33 = m33/divisor;
+
+		return new Matrix3d(r11, r12, r13, r21, r22, r23, r31, r32, r33);
+	}
+
 	@Override
 	public double getValue(int row, int column) {
 		switch (row) {

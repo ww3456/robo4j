@@ -21,7 +21,7 @@ package com.robo4j.math.geometry;
  * @author Marcus Hirt (@hirt)
  * @author Miro Wengner (@miragemiko)
  */
-public class EigenDecomposition {
+public class EigenDecomposition3 {
 
     /**
      * Smallest positive number such that {@code 1 - EPSILON} is not
@@ -30,19 +30,13 @@ public class EigenDecomposition {
     public static final double EPSILON = 0x1.0p-53;
 
     private static final int DIMENSION = 3;
-    private Matrix3d matrix3d;
-    private double splitTolerance;
     private TriDiagonalTransformer transformer;
     private double[] main;
     private double[] secondary;
     private double[] realEigenvalues;
-    private double[] imagEigenvalues;
     private double[][] eigenvectors = new double[DIMENSION][];
 
-    public EigenDecomposition(Matrix3d matrix3d, double splitTolerance) {
-
-        this.matrix3d = matrix3d;
-        this.splitTolerance = splitTolerance;
+    public EigenDecomposition3(Matrix3d matrix3d) {
         transformToTridiagonal(matrix3d);
         findEigenVectors(transformer.getQ().getData());
     }
@@ -66,7 +60,6 @@ public class EigenDecomposition {
         double[][] z = householderMatrix.clone();
         int n = this.main.length;
         this.realEigenvalues = new double[n];
-        this.imagEigenvalues = new double[n];
         double[] e = new double[n];
 
         for(int i = 0; i < n - 1; ++i) {

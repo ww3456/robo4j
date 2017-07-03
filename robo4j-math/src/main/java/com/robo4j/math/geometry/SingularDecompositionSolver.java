@@ -27,7 +27,6 @@ public class SingularDecompositionSolver {
 
     private final double[] singularValues;
     private final int n;
-    private final boolean transposed = false;
     private final double tol;
     private final Matrix cachedU;
     private Matrix cachedUt;
@@ -148,10 +147,6 @@ public class SingularDecompositionSolver {
         p = this.n;
         if (nct < this.n) {
             this.singularValues[nct] = A[nct][nct];
-        }
-
-        if (this.n < p) {
-            this.singularValues[p - 1] = 0.0D;
         }
 
         if (nrt + 1 < p) {
