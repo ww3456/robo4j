@@ -196,8 +196,10 @@ public class FitElilipsoid {
 		// [ 2Dxy By^2 2Fyz 2Hy ]
 		// [ 2Exz 2Fyz Cz^2 2Iz ]
 		// [ 2Gx 2Hy 2Iz -1 ] ]
-		return new Matrix4d(v.x1, v.x4, v.x5, v.x7, v.x4, v.x2, v.x6, v.x8, v.x5, v.x6, v.x3, v.x9, v.x7, v.x8, v.x9,
-				-1);
+		return new Matrix4d(v.x1, v.x4, v.x5, v.x7,
+				v.x4, v.x2, v.x6, v.x8,
+				v.x5, v.x6, v.x3, v.x9,
+				v.x7, v.x8, v.x9,-1);
 	}
 
 }
